@@ -765,6 +765,7 @@ function renderWorld(){
   });
   
   // Monsters
+  window._nearMon = null;
   monsters.forEach(m=>{
     if(!m.alive)return;
     if(m.nightOnly&&!isNightTime())return; // night-only monsters hidden during day
@@ -1437,4 +1438,3 @@ function initSort(q){
   });
 }
 function checkSort(){const q=pSess.qs[pSess.idx];const area=document.getElementById('sort-area');const order=[...area.children].map(c=>c.textContent);const ok=q.correct.every((v,i)=>v===order[i]);document.querySelector('.mcheck').disabled=true;if(ok){area.querySelectorAll('.sitem').forEach(s=>s.style.borderColor='#2ecc40');earnScore(20);showNotif('✅ Đúng thứ tự!');}else{area.querySelectorAll('.sitem').forEach(s=>s.style.borderColor='#e74c3c');showNotif('❌ Sai thứ tự!');}setTimeout(nextQ,1800);}
-

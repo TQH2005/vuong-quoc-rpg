@@ -765,7 +765,6 @@ function renderWorld(){
   });
   
   // Monsters
-  window._nearMon = null;
   monsters.forEach(m=>{
     if(!m.alive)return;
     if(m.nightOnly&&!isNightTime())return; // night-only monsters hidden during day
@@ -1006,7 +1005,6 @@ function renderWorld(){
     ctx.fillRect(hx,MM_Y+2,4,MM_H-4);
   });
   // Monsters on minimap
-  window._nearMon = null;
   monsters.forEach(m=>{
     if(!m.alive)return;
     if(m.type==='dragon_shadow'&&!isNightTime())return;

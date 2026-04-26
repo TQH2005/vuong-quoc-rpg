@@ -383,63 +383,86 @@ function drawBattleScene(atk,def,animType){
       }
     }
     else if(anim==='fire'||anim==='fireblast'||anim==='burn'){
-      // ── PIXEL ART FIREBALL flying from player to monster ─────
+      // ── FIREBALL: bay từ rồng (phải) → nhân vật (trái) ──────
       const BW=bcv.width, BH=bcv.height;
-      const ps=5; // pixel size
-      // Fireball position: travels from player (x≈110) to monster (x≈290)
-      const fbProgress=0.65; // snapshot at ~2/3 of travel
-      const fbX=Math.round(110+fbProgress*(290-110));
-      const fbY=68;
 
-      // ── Fireball core (pixel orb, lấy từ ảnh: vòng tròn cam/vàng) ──
-      const fbPixels=[
-        // glow trail (left of ball — hướng bay)
-        ['#cc2200',-12,-1,2,2],['#cc2200',-14,0,2,2],['#dd3300',-10,-1,3,2],
-        ['#ee5500',-8,0,3,3],['#ff6600',-6,-1,4,3],['#ff8800',-5,0,5,4],
-        // ball body
-        ['#ff8800',-3,-4,8,3],['#ff6600',-4,-3,10,6],['#ff4400',-4,-1,10,5],
-        ['#ff6600',-3, 2, 8,3],
-        // yellow center
-        ['#ffaa00',-2,-3, 6,2],['#ffcc00',-1,-2, 4,4],['#ffee00', 0,-1, 2,2],
-        // white hot core
-        ['#ffffff', 0,-1, 1,1],
-        // orange outer ring
-        ['#ff4400',-5,-5,10,2],['#ff4400',-5, 3,10,2],
-        ['#ff4400',-6,-4, 2,8],['#ff4400', 4,-4, 2,8],
-        // spark particles around ball
-        ['#ff8800', 6,-5, 2,2],['#ffaa00', 7,-2, 2,2],['#ff6600', 6, 2, 2,2],
-        ['#ff4400',-8,-6, 2,2],['#cc2200',-9,-2, 2,2],['#ff6600',-8, 3, 2,2],
-        ['#ffcc00', 8,-6, 2,2],['#ff8800',-10,-4, 2,2],
-        // scattered outer sparks
-        ['#ff6600', 9,-8, 2,2],['#ff4400',-11,-7, 2,2],
-        ['#ffaa00', 3,-9, 2,2],['#dd3300',-5,-8, 2,2],
-        ['#ff8800', 2, 5, 2,2],['#ff4400',-3, 6, 2,2],
-      ];
+      // Quả cầu dùng frameCount để tạo hoạt ảnh liên tục
+      // Rồng ở x≈880 (màn hình), nhân vật ở x≈75; trong canvas battle: rồng≈350, player≈75
+      const startX=340, endX=75;
+      const startY=72,  endY=72;
+      // progress lặp 0→1 theo frameCount (mỗi 30 frame = 1 lần bay)
+      const fbT=(frameCount%30)/30;
+      const fbX=Math.round(startX + (endX-startX)*fbT);
+      const fbY=Math.round(startY + (endY-startY)*fbT - Math.sin(fbT*Math.PI)*18); // cung nhẹ
+      const fbR=14+Math.sin(fbT*Math.PI)*4; // to lên khi bay gần lại
+
       bc.save();
-      bc.imageSmoothingEnabled=false;
-      fbPixels.forEach(([col,dx,dy,w,h])=>{
-        bc.fillStyle=col;
-        bc.fillRect(fbX+dx*ps, fbY+dy*ps, w*ps, h*ps);
-      });
-      // Glow halo
-      bc.globalAlpha=0.35;
-      const fg2=bc.createRadialGradient(fbX,fbY,2,fbX,fbY,28);
-      fg2.addColorStop(0,'#ffee00');fg2.addColorStop(0.4,'#ff6600');fg2.addColorStop(1,'transparent');
-      bc.fillStyle=fg2;bc.beginPath();bc.arc(fbX,fbY,28,0,Math.PI*2);bc.fill();
+
+      // Vệt lửa phía sau quả cầu (trail)
+      const trailLen=6;
+      for(let ti=1;ti<=trailLen;ti++){
+        const tp=Math.max(0, fbT - ti*0.04);
+        const tx=Math.round(startX+(endX-startX)*tp);
+        const ty=Math.round(startY+(endY-startY)*tp - Math.sin(tp*Math.PI)*18);
+        const tr2=fbR*(1-ti/trailLen)*0.7;
+        if(tr2<1) continue;
+        bc.globalAlpha=(1-ti/trailLen)*0.5;
+        const tg=bc.createRadialGradient(tx,ty,0,tx,ty,tr2*1.6);
+        tg.addColorStop(0,'rgba(255,160,0,0.9)');
+        tg.addColorStop(0.5,'rgba(255,60,0,0.5)');
+        tg.addColorStop(1,'transparent');
+        bc.fillStyle=tg;
+        bc.beginPath();bc.arc(tx,ty,tr2*1.6,0,Math.PI*2);bc.fill();
+      }
+
+      // Hào quang ngoài (outer glow)
+      bc.globalAlpha=0.35+Math.sin(frameCount*0.3)*0.1;
+      const og=bc.createRadialGradient(fbX,fbY,fbR*0.3,fbX,fbY,fbR*2.4);
+      og.addColorStop(0,'rgba(255,200,50,0.6)');
+      og.addColorStop(0.5,'rgba(255,80,0,0.3)');
+      og.addColorStop(1,'transparent');
+      bc.fillStyle=og;bc.beginPath();bc.arc(fbX,fbY,fbR*2.4,0,Math.PI*2);bc.fill();
+
+      // Thân quả cầu lửa (lớp cam đậm)
+      bc.globalAlpha=1;
+      const bg1=bc.createRadialGradient(fbX-fbR*0.3,fbY-fbR*0.3,fbR*0.1,fbX,fbY,fbR);
+      bg1.addColorStop(0,'#ffee88');
+      bg1.addColorStop(0.3,'#ff8800');
+      bg1.addColorStop(0.7,'#dd2200');
+      bg1.addColorStop(1,'#881100');
+      bc.fillStyle=bg1;bc.beginPath();bc.arc(fbX,fbY,fbR,0,Math.PI*2);bc.fill();
+
+      // Lõi sáng trắng/vàng
+      const cg=bc.createRadialGradient(fbX-fbR*0.25,fbY-fbR*0.25,0,fbX,fbY,fbR*0.55);
+      cg.addColorStop(0,'rgba(255,255,220,0.95)');
+      cg.addColorStop(0.5,'rgba(255,220,80,0.7)');
+      cg.addColorStop(1,'transparent');
+      bc.fillStyle=cg;bc.beginPath();bc.arc(fbX,fbY,fbR*0.55,0,Math.PI*2);bc.fill();
+
+      // Tia lửa nhỏ xung quanh (spark)
+      for(let si=0;si<7;si++){
+        const sa=si/7*Math.PI*2 + frameCount*0.08;
+        const sd=fbR*(1.1+Math.sin(frameCount*0.15+si)*0.25);
+        const sx=fbX+Math.cos(sa)*sd, sy=fbY+Math.sin(sa)*sd*0.7;
+        const sr=2.5+Math.sin(frameCount*0.2+si*1.3)*1.2;
+        bc.globalAlpha=0.7+Math.sin(frameCount*0.1+si)*0.2;
+        bc.fillStyle=si%2===0?'#ff8800':'#ffcc00';
+        bc.beginPath();bc.arc(sx,sy,sr,0,Math.PI*2);bc.fill();
+      }
+
       bc.restore();
 
-      // ── Impact flash on player ──────────────────────────────
-      bc.save();bc.globalAlpha=0.45;
-      const impG=bc.createRadialGradient(75,70,3,75,80,38);
-      impG.addColorStop(0,'#ffee00');impG.addColorStop(0.3,'#ff6600');impG.addColorStop(1,'transparent');
-      bc.fillStyle=impG;bc.beginPath();bc.arc(75,70,38,0,Math.PI*2);bc.fill();
-      bc.restore();
-
-      // Burn label (disabled - replaced by red tint)
-      if(false && (anim==='burn'||bBurnTurns>0)){
-        bc.save();bc.globalAlpha=0.95;bc.fillStyle='#ff4400';bc.font='bold 10px serif';bc.textAlign='center';
-        bc.shadowColor='#ff2200';bc.shadowBlur=6;
-        bc.fillText('🔥 THIÊU ĐỐT!',_isTouchDevice?280:300,22);bc.restore();
+      // Impact flash tại nhân vật khi quả cầu đến gần (fbT > 0.85)
+      if(fbT>0.82){
+        const impAlpha=(fbT-0.82)/0.18*0.7;
+        bc.save();bc.globalAlpha=impAlpha;
+        const impG=bc.createRadialGradient(75,70,2,75,70,42);
+        impG.addColorStop(0,'#ffffff');
+        impG.addColorStop(0.2,'#ffee00');
+        impG.addColorStop(0.5,'#ff6600');
+        impG.addColorStop(1,'transparent');
+        bc.fillStyle=impG;bc.beginPath();bc.arc(75,70,42,0,Math.PI*2);bc.fill();
+        bc.restore();
       }
     }
     else if(anim==='thunder'){

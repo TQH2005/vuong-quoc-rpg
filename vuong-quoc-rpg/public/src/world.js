@@ -1,3 +1,7 @@
+function isNightTime(){
+  const td=Math.sin(timeOfDay*Math.PI*2);
+  return td < -0.1;
+}
 function _buildBlockedZones(){
   const zones = [{x1:LAKE_X1-80, x2:LAKE_X2+80}];
   if(typeof houses!=='undefined') houses.forEach(h=>zones.push({x1:h.worldX-60, x2:h.worldX+h.width+60}));

@@ -765,6 +765,7 @@ function renderWorld(){
   });
   
   // Monsters
+  window._nearMon = null;
   monsters.forEach(m=>{
     if(!m.alive)return;
     if(m.nightOnly&&!isNightTime())return; // night-only monsters hidden during day
@@ -950,6 +951,7 @@ function renderWorld(){
       ctx.fillStyle=night?'rgba(80,0,0,0.9)':'rgba(0,0,0,0.8)';ctx.fillRect(rx-5,ry-22,m.w+10,12);
       ctx.fillStyle=night?'#ff4444':'#ff8a65';ctx.font='bold 15px "Times New Roman"';ctx.textAlign='center';
       ctx.fillText('[F] TẤN CÔNG',rx+m.w/2,ry-13);ctx.restore();
+      window._nearMon = m;
     }
   });
   

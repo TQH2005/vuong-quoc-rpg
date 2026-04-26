@@ -30,15 +30,34 @@ function drawBattleScene(atk,def,animType){
     bc.restore();
 
   } else if(isFireDragonBattle){
-    // ── HỎA LONG — nền địa ngục lửa ─────────────────────────
+    // ── HỎA LONG — địa ngục tầng 10, dung nham ──────────────
     const BW=bcv.width, BH=bcv.height;
+    // Nền gradient đỏ đen sâu
     const fbg=bc.createLinearGradient(0,0,0,BH);
-    fbg.addColorStop(0,'#150000');fbg.addColorStop(0.4,'#280600');fbg.addColorStop(1,'#3a0a00');
+    fbg.addColorStop(0,'#080000');fbg.addColorStop(0.35,'#1c0200');
+    fbg.addColorStop(0.7,'#2e0500');fbg.addColorStop(1,'#200300');
     bc.fillStyle=fbg;bc.fillRect(0,0,BW,BH);
-    // Núi lửa xa
-    bc.fillStyle='#0f0000';
+    // Trần hang động (nhũ đá đen)
+    bc.fillStyle='#0a0000';
+    for(let s=0;s<18;s++){
+      const sx=s*26+4+Math.sin(s*2.1)*6, sh=12+Math.sin(s*1.7)*10;
+      bc.beginPath();bc.moveTo(sx,0);bc.lineTo(sx+13,0);bc.lineTo(sx+6,sh);bc.closePath();bc.fill();
+    }
+    // Cột đá địa ngục
+    bc.fillStyle='#100000';
+    for(let p=0;p<4;p++){
+      const px=40+p*120;
+      bc.fillRect(px,0,18,Math.round(BH*0.65));
+      // crack sáng đỏ trên cột
+      const glow=0.3+Math.sin(frameCount*0.06+p)*0.15;
+      bc.save();bc.strokeStyle=`rgba(255,60,0,${glow})`;bc.lineWidth=1.5;
+      bc.beginPath();bc.moveTo(px+4,5);bc.lineTo(px+7,Math.round(BH*0.3));bc.lineTo(px+12,Math.round(BH*0.55));bc.stroke();
+      bc.restore();
+    }
+    // Núi lửa xa (silhouette)
+    bc.fillStyle='#0d0000';
     bc.beginPath();bc.moveTo(0,BH);
-    for(let hm=0;hm<8;hm++){bc.lineTo(hm*60+20,BH*0.42+Math.sin(hm*1.9)*BH*0.14);}
+    for(let hm=0;hm<9;hm++){bc.lineTo(hm*52+10,BH*0.38+Math.sin(hm*2.1)*BH*0.12);}
     bc.lineTo(BW,BH);bc.closePath();bc.fill();
     // Nền lửa dưới đất
     const groundY_f=Math.round(BH*0.76);
@@ -416,8 +435,8 @@ function drawBattleScene(atk,def,animType){
       bc.fillStyle=impG;bc.beginPath();bc.arc(300,70,38,0,Math.PI*2);bc.fill();
       bc.restore();
 
-      // Burn label
-      if(anim==='burn'||bBurnTurns>0){
+      // Burn label (disabled - replaced by red tint)
+      if(false && (anim==='burn'||bBurnTurns>0)){
         bc.save();bc.globalAlpha=0.95;bc.fillStyle='#ff4400';bc.font='bold 10px serif';bc.textAlign='center';
         bc.shadowColor='#ff2200';bc.shadowBlur=6;
         bc.fillText('🔥 THIÊU ĐỐT!',_isTouchDevice?280:300,22);bc.restore();
@@ -594,11 +613,13 @@ function drawBattleScene(atk,def,animType){
   else P.attackAnim=0;
   drawKnight(bc, 36+pShake, groundY-80, false, false, frameCount, !atk);
   P.attackAnim=_savedAtk; // restore
-  // Persistent burn flames ở chân player khi đang bị thiêu đốt
-  if(bPlayerBurnTurns>0 && !FX.active){
-    // Vẽ trực tiếp lên fxctx (persistent, không cần FX loop)
-    const _f=frameCount%65;
-    FX.drawFrame_playerBurn.call({MX:FX.MX,MY:FX.MY,PX:FX.PX,PY:FX.PY},_f,65);
+  // Thiêu đốt: nhân vật ửng đỏ (không hiệu ứng lửa bay)
+  if(bPlayerBurnTurns>0){
+    bc.save();
+    bc.globalAlpha=0.28+Math.sin(frameCount*0.18)*0.1;
+    bc.fillStyle='#ff2200';
+    bc.fillRect(36+pShake-2, groundY-82, 56, 86);
+    bc.restore();
   }
   // Hurt flash: tint đỏ khi bị đánh
   if(def){

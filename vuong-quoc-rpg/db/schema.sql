@@ -2,11 +2,7 @@
 -- SCHEMA.SQL — Tạo database & bảng
 -- Chạy: mysql -u root -p < db/schema.sql
 -- ══════════════════════════════════════════════
-
-CREATE DATABASE IF NOT EXISTS vuong_quoc_rpg
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE vuong_quoc_rpg;
+USE railway;
 
 -- Bảng người dùng
 CREATE TABLE IF NOT EXISTS users (

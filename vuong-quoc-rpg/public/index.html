@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🏰 Vương Quốc Tri Thức RPG HD</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@700;900&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div id="login-screen">
+  <div class="lg-logo">⚔️</div>
+  <div class="lg-title">VƯƠNG QUỐC TRI THỨC</div>
+
+  <!-- ĐĂNG NHẬP -->
+  <div id="lg-login-panel">
+    <div class="lg-sub">— ĐĂNG NHẬP ĐỂ TIẾP TỤC —</div>
+    <div class="lg-box">
+      <div>
+        <div class="lg-lbl">👤 Tài khoản</div>
+        <input class="lg-inp" id="lg-user" type="text" placeholder="Nhập tài khoản..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔒 Mật khẩu</div>
+        <input class="lg-inp" id="lg-pass" type="password" placeholder="Nhập mật khẩu..."/>
+      </div>
+      <div id="lg-err">❌ Tài khoản hoặc mật khẩu không đúng!</div>
+      <button class="lg-btn" id="lg-btn" onclick="doLogin()">▶ &nbsp;VÀO GAME</button>
+      <div class="lg-toggle">Chưa có tài khoản? <span onclick="showRegister()">Đăng ký ngay</span></div>
+    </div>
+  </div>
+
+  <!-- ĐĂNG KÝ -->
+  <div id="lg-register-panel" style="display:none">
+    <div class="lg-sub">— TẠO TÀI KHOẢN MỚI —</div>
+    <div class="lg-box" style="gap:10px;">
+      <div>
+        <div class="lg-lbl">👤 Họ và tên</div>
+        <input class="lg-inp" id="rg-name" type="text" placeholder="Nhập họ và tên..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🎂 Năm sinh</div>
+        <input class="lg-inp" id="rg-born" type="number" placeholder="VD: 2010" min="1990" max="2020"/>
+      </div>
+      <div>
+        <div class="lg-lbl">📱 Số điện thoại</div>
+        <input class="lg-inp" id="rg-phone" type="tel" placeholder="VD: 0912345678" autocomplete="off"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔑 Tên tài khoản</div>
+        <input class="lg-inp" id="rg-user" type="text" placeholder="Tên đăng nhập..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔒 Đặt mật khẩu</div>
+        <input class="lg-inp" id="rg-pass" type="password" placeholder="Nhập mật khẩu..."/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔒 Xác nhận mật khẩu</div>
+        <input class="lg-inp" id="rg-pass2" type="password" placeholder="Nhập lại mật khẩu..."/>
+      </div>
+      <div id="lg-reg-err">❌ Lỗi đăng ký!</div>
+      <div id="lg-reg-ok">✅ Đăng ký thành công!</div>
+      <button class="lg-btn" id="rg-btn" onclick="doRegister()">📜 &nbsp;ĐĂNG KÝ</button>
+      <div class="lg-toggle">Đã có tài khoản? <span onclick="showLogin()">Đăng nhập</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="wrap">
+<div id="game-title">⚔ VƯƠNG QUỐC TRI THỨC ⚔</div>
+<div id="canvas-border">
+  <canvas id="gc" width="640" height="360"></canvas>
+
+  <div id="hud">
+    <div class="hi">❤<div id="hp-track"><div id="hp-fill" style="width:100%"></div></div><span id="hp-txt" style="font-size:7px;margin-left:1px">100</span></div>
+    <div class="hi">💧<div id="mp-track" style="width:34px;height:6px;background:#00001a;border:1px solid #336;border-radius:3px;overflow:hidden"><div id="mp-fill" style="height:100%;width:100%;background:linear-gradient(90deg,#2196f3,#64b5f6);border-radius:3px;transition:width .3s"></div></div><span id="mp-txt" style="font-size:7px;margin-left:1px">80</span></div>
+    <div class="hi">🪙<span id="c-hud">0</span></div>
+    <div class="hi">⚔<span id="w-hud">Kiếm Gỗ</span></div>
+    <div class="hi" id="magic-hud-wrap" style="display:none">✨<span id="m-hud" style="color:#cc88ff">—</span></div>
+    <div class="hi">🧪<span id="pot-hud" style="font-size:7px">0</span><span style="color:#e74c3c;font-size:8px">❤</span><span id="mpot-hud" style="font-size:7px">0</span><span style="color:#2196f3;font-size:8px">💧</span></div>
+    <div class="hi">★<span id="lv-hud">Lv1</span></div>
+    <div class="hi" id="loc-hud" style="color:#aef">🌍 <span id="loc-txt">Vương Quốc</span></div>
+    <button id="hud-shop-btn" onclick="openShop()" title="Cửa hàng" style="pointer-events:all">🛒</button>
+    <button id="hud-bag-btn" onclick="openBag()" title="Túi đồ" style="pointer-events:all;background:linear-gradient(135deg,rgba(255,165,0,0.18),rgba(180,80,0,0.25));border:1px solid #ffa500;border-radius:4px;color:#ffa500;font-size:9px;width:24px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">🎒</button>
+    <button id="btn-result" onclick="openProgress()" title="Kết quả học tập" style="pointer-events:all;background:linear-gradient(135deg,rgba(46,204,64,0.15),rgba(0,100,20,0.2));border:1px solid #2ecc40;border-radius:4px;color:#2ecc40;font-size:9px;height:22px;padding:0 5px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;">📊</button>
+    <button id="btn-cmd" onclick="openCheatConsole()" title="Bảng lệnh" style="pointer-events:all;background:rgba(255,255,255,0.05);border:1px solid #555;border-radius:4px;color:#aaa;font-size:9px;height:22px;padding:0 5px;cursor:pointer;-webkit-tap-highlight-color:transparent;">⌨</button>
+  </div>
+  <div id="notif"></div>
+  <div class="ans-flash" id="ans-flash"></div>
+  <div id="npc-tip"></div>
+  <div id="streak-badge">🔥 <span id="streak-num">0</span> liên tiếp!</div>
+
+  <div id="indoor-wrap">
+    <canvas id="ic" width="640" height="360"></canvas>
+    <!-- Mobile exit button — always visible on top of indoor canvas -->
+    <button id="indoor-exit-btn" onclick="exitHouse()" style="
+      position:absolute;top:36px;left:8px;
+      background:rgba(0,0,0,0.88);
+      border:2px solid #e74c3c;color:#e74c3c;
+      font-family:'Times New Roman','IM Fell English SC',serif;font-size:7px;
+      padding:7px 10px;cursor:pointer;z-index:30;
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+      display:none;
+    ">← RA NGOÀI</button>
+  </div>
+
+  <div id="dialog">
+    <div id="dbox">
+      <div id="dname">NPC</div>
+      <div id="dtext"></div>
+      <div id="dchoices">
+        <button class="dbtn dbtn-yes" id="dbtn-yes">▶ BẮT ĐẦU!</button>
+        <button class="dbtn dbtn-no" id="dbtn-no">✕ THÔI</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end canvas-border -->
+
+  <!-- PUZZLE — fullscreen overlay ngoài canvas -->
+  <div id="puzzle"></div>
+
+  <!-- CHEAT CONSOLE -->
+  <div id="cheat-console">
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+      <div id="cheat-label">⌨ Bảng Điều Khiển</div>
+      <button onclick="closeCheatConsole()" style="background:rgba(255,50,50,0.2);border:1px solid #e74c3c;color:#e74c3c;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:14px;line-height:1;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">✕</button>
+    </div>
+    <input id="cheat-input" type="text" placeholder="Nhập lệnh..." autocomplete="off" spellcheck="false" onkeydown="handleCheatKey(event)">
+    <div style="display:flex;gap:8px;width:100%">
+      <button onclick="execCheatFromBtn()" style="flex:1;padding:8px 0;background:rgba(0,255,100,0.15);border:1px solid #00ff88;color:#00ff88;border-radius:4px;cursor:pointer;font-size:13px;font-family:monospace;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">✓ Thực thi</button>
+      <button onclick="closeCheatConsole()" style="flex:1;padding:8px 0;background:rgba(255,50,50,0.12);border:1px solid #e74c3c;color:#e74c3c;border-radius:4px;cursor:pointer;font-size:13px;font-family:monospace;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">✕ Đóng</button>
+    </div>
+    <div id="cheat-hint">ENTER = thực thi · ESC = đóng</div>
+    <div id="cheat-result"></div>
+  </div>
+
+  <!-- CAVE REWARD POPUP -->
+  <div id="cave-reward-popup">
+    <div class="crp-box">
+      <div class="crp-glow" id="crp-icon">🏆</div>
+      <div class="crp-title">✨ PHẦN THƯỞNG ĐẶC BIỆT ✨</div>
+      <div class="crp-name" id="crp-name">—</div>
+      <div class="crp-desc" id="crp-desc">—</div>
+      <button class="crp-btn" onclick="closeCaveRewardPopup()">🎒 NHẬN VÀO TÚI</button>
+    </div>
+  </div>
+
+  <!-- BAG OVERLAY -->
+  <div id="bag-overlay">
+    <div id="bag-title">🎒 TÚI ĐỒ</div>
+    <div id="bag-stats">
+      ❤️ <span id="bag-hp">100</span> &nbsp;|&nbsp;
+      💧 <span id="bag-mp">80</span> &nbsp;|&nbsp;
+      🪙 <span id="bag-coins">0</span> xu &nbsp;|&nbsp;
+      ★ <span id="bag-lv">Lv1</span>
+    </div>
+    <!-- Equipped bar -->
+    <div id="bag-equip-bar">
+      <div style="font-size:8px;color:#888;font-family:'Times New Roman',serif;letter-spacing:1px;margin-right:4px;">ĐANG DÙNG:</div>
+      <div class="equip-slot">
+        <div class="equip-slot-label">⚔ CẬN</div>
+        <div class="equip-slot-item" id="bag-eq-melee">—</div>
+      </div>
+      <div class="equip-slot">
+        <div class="equip-slot-label">✨ PHÉP</div>
+        <div class="equip-slot-item" id="bag-eq-magic" style="color:#cc88ff">—</div>
+      </div>
+      <div class="equip-slot">
+        <div class="equip-slot-label">🛡 GIÁP</div>
+        <div class="equip-slot-item" id="bag-eq-armor">—</div>
+      </div>
+      <div class="equip-slot" style="flex:1">
+        <div class="equip-slot-label">🧪 BÌNH</div>
+        <div class="equip-slot-item" id="bag-eq-pots">—</div>
+      </div>
+    </div>
+    <div id="bag-sections"></div>
+    <button id="bag-close" onclick="closeBag()">✕ ĐÓNG</button>
+  </div>
+
+  <!-- SHOP — fullscreen overlay ngoài canvas -->
+  <div id="shop">
+    <div id="shop-title">🏪 CỬA HÀNG ⚔</div>
+    <div id="shop-coins">🪙 <span id="shop-cn">0</span> xu &nbsp;|&nbsp; ❤️<span id="shop-hp">100</span> &nbsp;|&nbsp; 💧<span id="shop-mp">80</span></div>
+    <div id="shop-tabs" style="display:flex;gap:6px;margin-bottom:10px">
+      <button class="shop-tab active" id="stab-wpn" onclick="shopTab('wpn')">⚔ VŨ KHÍ</button>
+      <button class="shop-tab" id="stab-armor" onclick="shopTab('armor')">🛡️ GIÁP</button>
+      <button class="shop-tab" id="stab-potion" onclick="shopTab('potion')">🧪 BÌNH</button>
+    </div>
+    <div id="shop-grid"></div>
+    <button id="shop-close" onclick="closeShop()">✕ ĐÓNG</button>
+  </div>
+
+  <!-- PRE-BATTLE difficulty picker -->
+  <div id="prebattle-screen">
+    <div class="pb-title">⚔ CHỌN CẤP ĐỘ CÂU HỎI</div>
+    <div class="pb-sub">Cấp càng cao → phần thưởng càng lớn</div>
+    <div class="pb-monster" id="pb-monster-name"></div>
+    <div class="pb-btns">
+      <button class="pb-btn" onclick="confirmBattleDiff(1)"><span>🌱 Cấp 1 — Tân Binh</span><span class="pb-reward">+5% thưởng</span></button>
+      <button class="pb-btn" onclick="confirmBattleDiff(2)"><span>⚔️ Cấp 2 — Chiến Binh</span><span class="pb-reward">+15% thưởng</span></button>
+      <button class="pb-btn" onclick="confirmBattleDiff(3)"><span>🏆 Cấp 3 — Anh Hùng</span><span class="pb-reward">+30% thưởng</span></button>
+      <button class="pb-btn" onclick="confirmBattleDiff(4)"><span>🔥 Cấp 4 — Huyền Thoại</span><span class="pb-reward">+60% thưởng</span></button>
+      <button class="pb-btn" onclick="confirmBattleDiff(5)"><span>💀 Cấp 5 — Thần Thánh</span><span class="pb-reward">+120% thưởng</span></button>
+    </div>
+  </div>
+  <!-- BATTLE — fullscreen overlay ngoài canvas -->
+  <div id="battle">
+    <div class="b-wrap">
+      <div class="b-top">
+        <div class="b-ent">
+          <div class="b-name">HIỆP SĨ</div>
+          <div class="b-hprow">❤<div class="b-hpbg"><div class="b-hpbar" id="b-php" style="width:100%;background:linear-gradient(90deg,#2ecc40,#57ff6e);box-shadow:0 0 8px #2ecc40"></div></div><span style="font-size:6px;color:white;font-family:'Times New Roman'" id="b-php-n">100</span></div>
+          <div class="b-hprow" style="margin-top:3px">💧<div class="b-hpbg" style="background:#00001a;border-color:#336"><div class="b-hpbar" id="b-mp-fill" style="width:100%;background:linear-gradient(90deg,#2196f3,#64b5f6);box-shadow:0 0 6px #2196f3"></div></div><span style="font-size:6px;color:#64b5f6;font-family:'Times New Roman'" id="b-mp-txt">80</span></div>
+          <div id="b-armor-info" style="font-size:5px;color:#00bcd4;font-family:'Times New Roman';margin-top:1px"></div>
+        </div>
+        <div style="font-family:'Times New Roman','IM Fell English',serif;color:var(--gold);font-size:14px;letter-spacing:2px">VS</div>
+        <div class="b-ent" style="text-align:right">
+          <div class="b-name" id="b-mname">QUÁI VẬT</div>
+          <div class="b-hprow" style="justify-content:flex-end"><span style="font-size:6px;color:white;font-family:'Times New Roman'" id="b-mhp-n">50</span><div class="b-hpbg"><div class="b-hpbar" id="b-mhp" style="width:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);box-shadow:0 0 8px #e74c3c"></div></div>💚</div>
+        </div>
+      </div>
+      <div id="battle-quiz-overlay">
+        <div class="bq-title" id="bq-title">❓ GIẢI ĐỐ ĐỂ TẤN CÔNG!</div>
+        <div class="bq-question" id="bq-question"></div>
+        <div class="bq-opts" id="bq-opts"></div>
+      </div>
+      <canvas id="b-canvas" width="440" height="130"></canvas>
+      <canvas id="fx-canvas" width="440" height="130" style="position:absolute;inset:0;pointer-events:none;image-rendering:pixelated;"></canvas>
+      <div id="b-log"></div>
+      <div class="bbtns">
+        <button class="bbtn bbtn-a" onclick="doB('attack')">⚔ ĐÁNH</button>
+        <button class="bbtn bbtn-m" onclick="doB('magic')">✨ PHÉP <span id="b-mana-cost" style="font-size:5px;opacity:0.8">(-28MP)</span></button>
+        <button class="bbtn bbtn-hp" onclick="doB('hppot')" style="border-color:#e74c3c;color:#e74c3c;">🧪 BÌNH MÁU (<span id="b-hppot">0</span>)</button>
+        <button class="bbtn bbtn-mp2" onclick="doB('manapot')" style="border-color:#2196f3;color:#2196f3;">💧 BÌNH MANA (<span id="b-manapot">0</span>)</button>
+        <button class="bbtn bbtn-r" onclick="doB('flee')">↩ CHẠY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINIGAME OVERLAY — cổng vào boss (Cờ Vua / Cờ Caro / Mật Mã) -->
+  <div id="minigame-overlay">
+    <div id="minigame-header">
+      <div id="minigame-title">⚔ THÁCH ĐẤU</div>
+      <div id="minigame-hint">Chiến thắng để gặp Rồng!</div>
+      <button id="minigame-flee" onclick="closeMinigame(false)">↩ Bỏ cuộc</button>
+    </div>
+    <div id="minigame-inner"></div>
+  </div>
+
+  <!-- RESULT — fullscreen overlay ngoài canvas -->
+  <div id="result">
+    <div id="res-emoji">🏆</div>
+    <div id="res-title">HOÀN THÀNH!</div>
+    <div id="res-score"></div>
+    <div id="res-coins"></div>
+    <div id="res-msg"></div>
+    <div class="res-btns">
+      <button class="rbtn rbtn-cont" onclick="returnGame()">▶ TIẾP TỤC</button>
+      <button class="rbtn rbtn-shop" onclick="openShopFromRes()">🛒 MUA VŨ KHÍ</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS OVERLAY -->
+  <div id="prog-overlay">
+    <div class="prog-header">
+      <div class="prog-title">📊 TIẾN ĐỘ HỌC TẬP</div>
+      <button class="prog-close" onclick="closeProgress()">✕ ĐÓNG</button>
+    </div>
+    <div class="prog-tabs">
+      <button class="ptab on" onclick="progTab('overview')" id="ptab-overview">📈 TỔNG QUAN</button>
+      <button class="ptab" onclick="progTab('subjects')" id="ptab-subjects">📚 TỪNG MÔN</button>
+      <button class="ptab" onclick="progTab('types')" id="ptab-types">🧩 LOẠI CÂU</button>
+      <button class="ptab" onclick="progTab('cave')" id="ptab-cave">🏔 HANG ĐỘNG</button>
+      <button class="ptab" onclick="progTab('log')" id="ptab-log">📋 LỊCH SỬ</button>
+    </div>
+    <div class="prog-body" id="prog-body"></div>
+  </div>
+</div>
+
+</div><!-- end wrap -->
+<div id="hint">WASD / ← → = DI CHUYỂN &nbsp;·&nbsp; SPACE/E = VÀO NHÀ &nbsp;·&nbsp; F = TẤN CÔNG &nbsp;·&nbsp; B = CỬA HÀNG &nbsp;·&nbsp; ESC = THOÁT</div>
+
+<!-- DIFFICULTY SELECT SCREEN -->
+<div id="diff-screen">
+  <div id="diff-subj-badge">🏛️ LỊCH SỬ</div>
+  <div id="diff-title">CHỌN CẤP ĐỘ KHÓ</div>
+  <div id="diff-subtitle">Cấp độ càng cao → câu hỏi khó hơn → thưởng xu nhiều hơn!</div>
+  <button class="diff-btn diff-1" onclick="startPuzzleWithDiff(1)">
+    <span class="diff-icon">🌱</span>
+    <div class="diff-info"><div class="diff-name">CẤP 1 — TÂN BINH</div><div class="diff-desc">Câu hỏi cơ bản, dễ trả lời. Phù hợp người mới bắt đầu.</div></div>
+    <div class="diff-reward">+10 xu</div>
+  </button>
+  <button class="diff-btn diff-2" onclick="startPuzzleWithDiff(2)">
+    <span class="diff-icon">⚔️</span>
+    <div class="diff-info"><div class="diff-name">CẤP 2 — CHIẾN BINH</div><div class="diff-desc">Câu hỏi trung bình, cần suy nghĩ thêm một chút.</div></div>
+    <div class="diff-reward">+20 xu</div>
+  </button>
+  <button class="diff-btn diff-3" onclick="startPuzzleWithDiff(3)">
+    <span class="diff-icon">🏆</span>
+    <div class="diff-info"><div class="diff-name">CẤP 3 — ANH HÙNG</div><div class="diff-desc">Câu hỏi khó, kiến thức vững mới chiến thắng được.</div></div>
+    <div class="diff-reward">+35 xu</div>
+  </button>
+  <button class="diff-btn diff-4" onclick="startPuzzleWithDiff(4)">
+    <span class="diff-icon">🔥</span>
+    <div class="diff-info"><div class="diff-name">CẤP 4 — HUYỀN THOẠI</div><div class="diff-desc">Câu hỏi rất khó, chỉ dành cho người học giỏi thật sự.</div></div>
+    <div class="diff-reward">+55 xu</div>
+  </button>
+  <button class="diff-btn diff-5" onclick="startPuzzleWithDiff(5)">
+    <span class="diff-icon">💀</span>
+    <div class="diff-info"><div class="diff-name">CẤP 5 — THẦN THÁNH</div><div class="diff-desc">Thử thách tối thượng! Sai một câu mất điểm nhiều hơn.</div></div>
+    <div class="diff-reward">+80 xu</div>
+  </button>
+  <button id="diff-back" onclick="closeDiffScreen()">← QUAY LẠI</button>
+</div>
+
+<!-- VIRTUAL CONTROLS — fixed position, outside wrap -->
+<div id="vcontrols">
+  <!-- Left: Joystick -->
+  <div id="joystick-zone">
+    <div id="joystick-base">
+      <span class="dpad-hint dh-l">◀</span>
+      <span class="dpad-hint dh-r">▶</span>
+      <span class="dpad-hint dh-u">▲</span>
+      <span class="dpad-hint dh-d">▼</span>
+    </div>
+    <div id="joystick-knob"></div>
+  </div>
+
+  <!-- Centre: hint only -->
+  <div id="vctr-mid">
+    <div id="btn-interact-hint">👆 Tương tác</div>
+  </div>
+
+  <!-- Right: 2×2 action grid -->
+  <div id="abtns">
+    <div class="abtn-v" id="btn-attack">⚔</div>
+    <div class="abtn-v" id="btn-action">E</div>
+    <div class="abtn-v" id="btn-shop">🛒</div>
+    <div class="abtn-v" id="btn-bag">🎒</div>
+  </div>
+</div>
+
+<!-- OCEAN EXIT BUTTON — shown when inOcean -->
+<button id="ocean-exit-btn" onclick="exitOceanWorld()" style="
+  display:none;position:fixed;bottom:16px;right:16px;z-index:200;
+  background:linear-gradient(135deg,rgba(0,80,160,0.92),rgba(0,40,100,0.95));
+  border:2px solid #44aaff;border-radius:8px;
+  color:#aaddff;font-family:'Times New Roman',serif;font-size:13px;font-weight:bold;
+  padding:10px 18px;cursor:pointer;letter-spacing:1px;
+  box-shadow:0 0 16px rgba(0,150,255,0.5),inset 0 0 8px rgba(0,100,200,0.2);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+">🌊 ↑ THOÁT</button>
+
+<!-- CAVE MAP OVERLAY — fixed fullscreen -->
+<div id="cave-overlay">
+  <div id="cave-title">🗺 BẢN ĐỒ HANG ĐỘNG 🗺</div>
+  <div id="cave-sub">Chọn chương học để khám phá!</div>
+  <div id="chap-tabs">
+    <button class="chap-tab ch0 active" onclick="selectChap(0)">🌿 ĐỒNG CỎ</button>
+    <button class="chap-tab ch1" onclick="selectChap(1)">🌊 ĐẠI DƯƠNG</button>
+    <button class="chap-tab ch2" onclick="selectChap(2)">☁️ BẦU TRỜI</button>
+  </div>
+  <div id="chap-info">Chương 1: Vùng Đồng Cỏ — Khám phá cây cối, động vật và thiên nhiên mặt đất!</div>
+  <div id="cave-map"></div>
+  <button id="cave-close" onclick="closeCave()">✕ ĐÓNG</button>
+</div>
+
+
+<!-- UNDERGROUND DUNGEON OVERLAY — full walkable world -->
+<div id="underground-overlay">
+  <div id="underground-hud">
+    <span class="ug-hud-item">⛏ LÒNG ĐẤT</span>
+    <span class="ug-hud-item" id="ug-floor-txt">Tầng 1 / 10</span>
+    <span class="ug-hud-item" id="ug-floor-name">Hang Tối</span>
+    <span class="ug-hud-item" id="ug-hp-txt" style="color:#ff4444">❤ 100</span>
+    <button onclick="exitUnderground()" style="background:rgba(100,0,0,0.5);border:1px solid #ff4400;color:#ff8844;font-family:'Times New Roman',serif;font-size:10px;padding:3px 10px;cursor:pointer;border-radius:3px;margin-left:8px;">↑ THOÁT</button>
+  </div>
+  <canvas id="underground-canvas" width="640" height="300"></canvas>
+  <!-- Mobile controls inside underground -->
+  <div id="ug-controls" style="display:none;width:100%;height:80px;background:rgba(0,0,0,0.7);flex-direction:row;align-items:center;justify-content:space-between;padding:8px 16px;">
+    <div style="display:flex;gap:10px;">
+      <button id="ug-left"  style="width:52px;height:52px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.3);border-radius:8px;color:#fff;font-size:22px;">◀</button>
+      <button id="ug-right" style="width:52px;height:52px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.3);border-radius:8px;color:#fff;font-size:22px;">▶</button>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button id="ug-jump"   style="width:52px;height:52px;background:rgba(100,200,255,0.2);border:2px solid rgba(100,200,255,0.5);border-radius:50%;color:#aef;font-size:18px;">↑</button>
+      <button id="ug-attack" style="width:52px;height:52px;background:rgba(255,100,0,0.25);border:2px solid rgba(255,150,0,0.6);border-radius:50%;color:#ffa;font-size:18px;">⚔</button>
+    </div>
+  </div>
+  <!-- Interaction prompt -->
+  <div id="ug-prompt" style="display:none;position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.88);border:1px solid #ffd700;border-radius:4px;padding:5px 14px;color:#ffd700;font-family:'Times New Roman',serif;font-size:12px;pointer-events:none;white-space:nowrap;"></div>
+</div>
+
+<!-- SHADOW DRAGON DEBUFF TAG -->
+<div class="debuff-tag" id="shadow-debuff-tag">👁 ÁM ĐEN — Sát thương -50%</div>
+<!-- HAC LONG DMG DEBUFF -->
+<div class="debuff-tag" id="hac-dmg-tag" style="background:rgba(40,0,60,0.92);border-color:#9900cc;color:#cc88ff;top:38px;">🔮 QUẢ CẦU HẮC ÁM — Sát thương -40% (3 vòng)</div>
+<!-- HAC LONG DEF DEBUFF -->
+<div class="debuff-tag" id="hac-def-tag" style="background:rgba(20,0,30,0.92);border-color:#660099;color:#aa66dd;top:57px;">🌑 HƠI THỞ BÓNG TỐI — Phòng thủ -50% (2 vòng)</div>
+<!-- SOUL STATE TAG -->
+<div class="debuff-tag" id="soul-state-tag" style="background:rgba(40,0,80,0.9);border-color:#cc44ff;color:#dd88ff;top:54px;">💀 LINH HỒN — Rồng không thể đánh</div>
+
+<!-- LEVEL START MODAL — fixed fullscreen -->
+<div id="level-start">
+  <div id="ls-icon">⚔️</div>
+  <div id="ls-title">MÀN 1</div>
+  <div id="ls-desc">Chuẩn bị chinh phục thử thách!</div>
+  <div id="ls-qs">5 câu hỏi</div>
+  <div class="ls-btns">
+    <button class="ls-go" id="ls-go-btn" onclick="startLevelPuzzle()">▶ BẮT ĐẦU!</button>
+    <button class="ls-back" onclick="closeLevelStart()">← QUAY LẠI</button>
+  </div>
+</div>
+
+
+<!-- ══ SCRIPTS — thứ tự load quan trọng! ══ -->
+<script src="src/effects.js"></script>
+<script src="src/sprites.js"></script>
+<script src="src/oceanDraw.js"></script>
+<script src="src/buildings.js"></script>
+<script src="src/worldDraw.js"></script>
+<script src="src/world.js"></script>
+<script src="src/ocean.js"></script>
+<script src="src/battle.js"></script>
+<script src="src/battleDraw.js"></script>
+<script src="src/hud.js"></script>
+<script src="src/shop.js"></script>
+<script src="src/bag.js"></script>
+<script src="src/cave.js"></script>
+<script src="src/underground.js"></script>
+<script src="src/progress.js"></script>
+<script src="src/minigame.js"></script>
+<script src="src/chess.js"></script>
+<script src="src/caro.js"></script>
+<script src="src/cipher.js"></script>
+<script src="src/input.js"></script>
+<script src="src/controls.js"></script>
+<script src="src/api.js"></script>
+<script src="src/login.js"></script>
+<script src="src/gameLoop.js"></script>
+</body>
+</html>

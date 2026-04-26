@@ -155,259 +155,179 @@ function drawBattleScene(atk,def,animType){
     bc.restore();
 
   } else {
-    // ── THẾ GIỚI NGOÀI — PIXEL ART như ảnh tham khảo ─────────
-    const BW=bcv.width, BH=bcv.height;
-    const PS=4; // pixel size for pixel art grid
+    // ── THẾ GIỚI NGOÀI — vẽ y hệt ngoài map ──────────────────
+    const BW=bcv.width, BH=bcv.height; // 440 x 130
+    const bGY=Math.round(BH*0.69);     // đường đất trong battle canvas
 
-    // ── Bầu trời pixel ────────────────────────────────────────
-    if(night){
-      // Đêm: gradient tối xanh navy
-      const sky=bc.createLinearGradient(0,0,0,BH*0.62);
-      sky.addColorStop(0,'#020818');sky.addColorStop(0.6,'#061230');sky.addColorStop(1,'#0a1c48');
-      bc.fillStyle=sky;bc.fillRect(0,0,BW,BH*0.62);
-    } else {
-      // Ngày: bầu trời xanh pixel art (dải màu ngang như ảnh)
-      const skyRows=[
-        [0,    0.08, '#5ba4d4'],
-        [0.08, 0.18, '#62aad8'],
-        [0.18, 0.30, '#6ab2dc'],
-        [0.30, 0.42, '#72b8e0'],
-        [0.42, 0.55, '#7ec0e8'],
-        [0.55, 0.62, '#8ecaee'],
-      ];
-      skyRows.forEach(([y0,y1,col])=>{
-        bc.fillStyle=col;
-        bc.fillRect(0,Math.round(BH*y0),BW,Math.round(BH*(y1-y0))+1);
-      });
-    }
-
-    // ── Sao ban đêm ───────────────────────────────────────────
-    if(night){
-      bc.save();
-      for(let s=0;s<28;s++){
-        const sx=((s*67+13)%BW),sy=((s*41+7)%(BH*0.48));
-        const twinkle=0.3+Math.sin(frameCount*0.09+s*1.4)*0.4;
-        bc.globalAlpha=twinkle;
-        bc.fillStyle=s%4===0?'#aaccff':'#ffffff';
-        bc.fillRect(Math.round(sx/PS)*PS,Math.round(sy/PS)*PS,s%3===0?2:PS,s%3===0?2:PS);
-      }
-      // Trăng pixel
-      bc.globalAlpha=0.92;
-      const moonX=Math.round(BW*0.78/PS)*PS, moonY=Math.round(BH*0.08/PS)*PS;
-      const moonPixels=[
-        [0,0,4,3],[PS,0,4,3],[-PS,PS,4,3],[0,PS,4,3],[PS,PS,4,3],[2*PS,PS,4,3],
-        [-PS,2*PS,4,3],[0,2*PS,4,3],[PS,2*PS,4,3],[2*PS,2*PS,4,3],
-        [0,3*PS,4,3],[PS,3*PS,4,3],
-      ];
-      moonPixels.forEach(([dx,dy,w,h])=>{
-        bc.fillStyle='#f0e090';bc.fillRect(moonX+dx,moonY+dy,w,h);
-      });
-      bc.restore();
-    }
-
-    // ── Mây pixel art (giống ảnh) ─────────────────────────────
-    if(!night){
-      bc.save();
-      bc.imageSmoothingEnabled=false;
-      // Hàm vẽ mây pixel đơn
-      function drawPixelCloud(cx,cy,scale){
-        const S=PS*scale;
-        // Mây trắng với viền xanh nhạt – style pixel
-        const cloudShape=[
-          // [dx_blocks, dy_blocks, w_blocks, h_blocks]
-          [2,1,3,1],[1,0,5,1],[0,1,7,2],[1,3,5,1],[2,4,3,1], // body
-        ];
-        cloudShape.forEach(([bx,by,bw,bh])=>{
-          bc.fillStyle='#f0f8ff';
-          bc.fillRect(cx+bx*S,cy+by*S,bw*S,bh*S);
-        });
-        // Highlight trên cùng
-        [[2,1,3,1],[1,0,5,1]].forEach(([bx,by,bw])=>{
-          bc.fillStyle='#ffffff';
-          bc.fillRect(cx+bx*S,cy+by*S,bw*S,Math.max(2,S*0.5));
-        });
-        // Bóng tối dưới
-        [[0,2,7,1],[1,3,5,1]].forEach(([bx,by,bw])=>{
-          bc.fillStyle='rgba(180,210,240,0.55)';
-          bc.fillRect(cx+bx*S,cy+by*S,bw*S,S*0.5);
-        });
-      }
-      // Mây trôi nhẹ (frameCount để animate)
-      const cloudDrift=(frameCount*0.18)%BW;
-      const clouds=[
-        {bx:20,  by:Math.round(BH*0.07), sc:1.1},
-        {bx:140, by:Math.round(BH*0.04), sc:0.9},
-        {bx:260, by:Math.round(BH*0.09), sc:1.0},
-        {bx:370, by:Math.round(BH*0.05), sc:0.85},
-      ];
-      clouds.forEach(({bx,by,sc})=>{
-        const cx=((bx+cloudDrift)%BW+BW)%BW;
-        drawPixelCloud(cx,by,sc);
-        // Vẽ thêm lần nữa nếu mây gần rìa phải để wrap mượt
-        if(cx+100>BW) drawPixelCloud(cx-BW,by,sc);
-      });
-      bc.restore();
-    }
-
-    // ── Hàng cây pixel art phía sau (tán tròn kiểu ảnh) ───────
-    const treeLineY=Math.round(BH*0.55); // đường cỏ cây phía xa
-    bc.save();
-    bc.imageSmoothingEnabled=false;
-
-    function drawPixelTree(tx,ty,sz,isDark){
-      // Thân cây pixel
-      const trunkW=Math.max(4,Math.round(sz*0.18/PS)*PS);
-      const trunkH=Math.round(sz*0.38);
-      const trunkX=tx-trunkW/2;
-      const trunkY=ty-trunkH;
-      const trunkDark=isDark?'#1a0c04':'#5c3010';
-      const trunkMid=isDark?'#220e06':'#7a4218';
-      bc.fillStyle=trunkDark;bc.fillRect(trunkX,trunkY,trunkW,trunkH);
-      bc.fillStyle=trunkMid;bc.fillRect(trunkX+2,trunkY+2,Math.max(2,trunkW-4),trunkH-4);
-
-      // Tán cây tròn pixel (dùng lưới pixel)
-      const R=Math.round(sz*0.46);
-      const centerX=tx, centerY=ty-trunkH-R*0.7;
-      const canopyColors=isDark
-        ?['#0e2408','#142e0a','#0a1c06','#183210']
-        :['#2e8018','#3a9820','#269010','#44a828','#1e6a10'];
-      const darkerEdge=isDark?'#0a1c06':'#1e6a10';
-      const highlight=isDark?'#1c3a0e':'#4ab830';
-
-      // Vẽ tán theo lưới pixel
-      const step=PS*1;
-      for(let py=centerY-R;py<=centerY+R;py+=step){
-        for(let px=centerX-R;px<=centerX+R;px+=step){
-          const dist=Math.sqrt((px-centerX)**2+(py-centerY)**2);
-          if(dist<=R){
-            // Màu theo khoảng cách từ tâm
-            let col;
-            if(dist<R*0.25) col=highlight;
-            else if(dist<R*0.55) col=canopyColors[1];
-            else if(dist<R*0.78) col=canopyColors[0];
-            else col=darkerEdge;
-            // Thêm variation dựa trên vị trí
-            const noiseIdx=Math.abs(Math.round(px/PS+py/PS*3))%canopyColors.length;
-            if(dist>R*0.3 && dist<R*0.85) col=canopyColors[noiseIdx];
-            bc.fillStyle=col;
-            bc.fillRect(Math.round(px/PS)*PS,Math.round(py/PS)*PS,step,step);
-          }
+    // ── Bầu trời (logic giống drawSky) ────────────────────────
+    {
+      const td=Math.sin(timeOfDay*Math.PI*2);
+      const isDawn=timeOfDay>0.1&&timeOfDay<0.3;
+      const isDusk=timeOfDay>0.6&&timeOfDay<0.85;
+      let skyTop,skyMid,skyBot;
+      if(night){skyTop='#020410';skyMid='#050820';skyBot='#0a0d1a';}
+      else if(isDawn){const t=(timeOfDay-0.1)/0.2;skyTop=`hsl(240,60%,${8+t*22}%)`;skyMid=`hsl(${220+t*40},70%,${18+t*30}%)`;skyBot=`hsl(${10+t*20},80%,${30+t*25}%)`;}
+      else if(isDusk){const t=(timeOfDay-0.6)/0.25;skyTop=`hsl(${240-t*60},55%,${30-t*12}%)`;skyMid=`hsl(${30+t*10},90%,${40+t*5}%)`;skyBot='hsl(15,95%,50%)';}
+      else{skyTop=`hsl(210,${60+td*30}%,${15+td*38}%)`;skyMid=`hsl(200,55%,${25+td*35}%)`;skyBot=`hsl(195,${50+td*20}%,${35+td*30}%)`;}
+      const sky=bc.createLinearGradient(0,0,0,bGY);
+      sky.addColorStop(0,skyTop);sky.addColorStop(0.5,skyMid);sky.addColorStop(1,skyBot);
+      bc.fillStyle=sky;bc.fillRect(0,0,BW,bGY);
+      // Sao đêm
+      if(td<0.3){
+        bc.save();bc.globalAlpha=Math.min(1,(0.3-td)/0.3);
+        for(let s=0;s<30;s++){
+          const sx=(s*157+33)%BW,sy=(s*97)%(bGY*0.75);
+          bc.fillStyle=s%5===0?'#aaddff':'#ffffff';
+          bc.globalAlpha*=0.4+Math.sin(frameCount*0.04+s*1.3)*0.6;
+          bc.fillRect(sx,sy,s%7===0?2:1,s%7===0?2:1);
+          bc.globalAlpha=Math.min(1,(0.3-td)/0.3);
         }
+        const moonX=BW*0.78,moonY=bGY*0.15;
+        bc.globalAlpha=0.9;bc.shadowColor='#cceeff';bc.shadowBlur=12;
+        bc.fillStyle='#e8f0ff';bc.beginPath();bc.arc(moonX,moonY,8,0,Math.PI*2);bc.fill();
+        bc.fillStyle='#c8d8f0';bc.beginPath();bc.arc(moonX+2,moonY-2,6,0,Math.PI*2);bc.fill();
+        bc.shadowBlur=0;bc.restore();
       }
-      // Highlight phía trên trái (ánh sáng)
-      if(!isDark){
-        bc.save();bc.globalAlpha=0.35;
-        bc.fillStyle='#80e840';
-        for(let py=centerY-R;py<=centerY-R*0.2;py+=step){
-          for(let px=centerX-R*0.6;px<=centerX+R*0.2;px+=step){
-            const dist=Math.sqrt((px-centerX)**2+(py-centerY)**2);
-            if(dist<=R*0.75) bc.fillRect(Math.round(px/PS)*PS,Math.round(py/PS)*PS,step,step);
-          }
-        }
+      if(td>-0.1){
+        const sunX=BW*0.74,sunY=bGY*0.18+td*(-bGY*0.1);
+        bc.save();
+        const halo=bc.createRadialGradient(sunX,sunY,0,sunX,sunY,28);
+        if(isDusk||isDawn){halo.addColorStop(0,'rgba(255,180,60,0.5)');halo.addColorStop(0.4,'rgba(255,120,30,0.2)');halo.addColorStop(1,'transparent');}
+        else{halo.addColorStop(0,'rgba(255,230,150,0.4)');halo.addColorStop(0.5,'rgba(255,210,100,0.1)');halo.addColorStop(1,'transparent');}
+        bc.fillStyle=halo;bc.beginPath();bc.arc(sunX,sunY,28,0,Math.PI*2);bc.fill();
+        const sunCol=isDusk||isDawn?'#ff8c00':'#fff5cc';
+        bc.shadowColor=sunCol;bc.shadowBlur=14;
+        bc.fillStyle=sunCol;bc.fillRect(sunX-5,sunY-5,10,10);
+        bc.fillStyle=isDusk||isDawn?'#ffcc44':'#fffde0';bc.fillRect(sunX-3,sunY-3,6,6);
+        bc.fillStyle='#ffffff';bc.fillRect(sunX-1,sunY-4,3,2);bc.shadowBlur=0;
+        bc.strokeStyle=isDusk||isDawn?'rgba(255,140,0,0.4)':'rgba(255,220,100,0.35)';bc.lineWidth=1;
+        for(let r=0;r<8;r++){const a=r*Math.PI/4+frameCount*0.006;bc.beginPath();bc.moveTo(sunX+Math.cos(a)*7,sunY+Math.sin(a)*7);bc.lineTo(sunX+Math.cos(a)*13,sunY+Math.sin(a)*13);bc.stroke();}
         bc.restore();
       }
     }
 
-    // Cây to 2 bên (như ảnh tham khảo)
-    if(!night){
-      // Cây trái to
-      drawPixelTree(Math.round(BW*0.18),treeLineY+Math.round(BH*0.1),56,false);
-      // Cây phải to
-      drawPixelTree(Math.round(BW*0.78),treeLineY+Math.round(BH*0.06),60,false);
-      // Cây nhỏ giữa/nền
-      drawPixelTree(Math.round(BW*0.5),treeLineY+Math.round(BH*0.03),32,false);
-    } else {
-      drawPixelTree(Math.round(BW*0.18),treeLineY+Math.round(BH*0.1),56,true);
-      drawPixelTree(Math.round(BW*0.78),treeLineY+Math.round(BH*0.06),60,true);
-      drawPixelTree(Math.round(BW*0.5),treeLineY+Math.round(BH*0.03),32,true);
-    }
-    bc.restore();
-
-    // ── Dải cỏ nền xa (hàng pixel ngang) ─────────────────────
-    const grassFarY=treeLineY;
-    if(!night){
-      // Nhiều lớp cỏ xa
-      [[0,'#2a6e18'],[PS,'#348820'],[PS*2,'#3a9224'],[PS*3,'#3e9828']].forEach(([dy,col])=>{
-        bc.fillStyle=col;bc.fillRect(0,grassFarY+dy,BW,PS);
-      });
-      // Bush/bụi cỏ xa pixel - hàng ngang
-      bc.fillStyle='#2e8018';
-      for(let bx=0;bx<BW;bx+=PS*3){
-        const bh=(Math.sin(bx*0.13+7)*2+3);
-        bc.fillRect(bx,grassFarY-Math.round(bh/PS)*PS,PS*3,Math.round(bh/PS)*PS);
-      }
-    } else {
-      [[0,'#0c2008'],[PS,'#0e2a0a'],[PS*2,'#102c0c']].forEach(([dy,col])=>{
-        bc.fillStyle=col;bc.fillRect(0,grassFarY+dy,BW,PS);
-      });
+    // ── Núi xa ────────────────────────────────────────────────
+    {
+      bc.save();bc.globalAlpha=night?0.7:0.55;
+      const mt=bc.createLinearGradient(0,bGY*0.3,0,bGY);
+      mt.addColorStop(0,night?'#0d1525':'#1e2d4a');mt.addColorStop(1,night?'#060a12':'#0e1825');
+      bc.fillStyle=mt;bc.beginPath();bc.moveTo(0,bGY);
+      [[0,0.5],[0.08,0.28],[0.18,0.45],[0.28,0.16],[0.4,0.35],[0.52,0.12],[0.65,0.3],[0.78,0.1],[0.9,0.28],[1,0.22]].forEach(([fx,fy])=>bc.lineTo(fx*BW,bGY*(0.32+fy*0.38)));
+      bc.lineTo(BW,bGY);bc.closePath();bc.fill();bc.restore();
     }
 
-    // ── Dải cỏ pixel chính (ground level) ────────────────────
-    const groundY2=Math.round(BH*0.78);
-    bc.save();
-    bc.imageSmoothingEnabled=false;
+    // ── Đồi gần ───────────────────────────────────────────────
+    {
+      bc.save();bc.globalAlpha=night?0.85:0.75;
+      const hil=bc.createLinearGradient(0,bGY*0.45,0,bGY);
+      hil.addColorStop(0,night?'#0d1a12':'#1a3a22');hil.addColorStop(1,night?'#080d09':'#0f2215');
+      bc.fillStyle=hil;bc.beginPath();bc.moveTo(0,bGY);
+      for(let hx=0;hx<=BW+5;hx+=3){bc.lineTo(hx,bGY*0.62+Math.sin(hx*0.04)*9+Math.sin(hx*0.09)*5);}
+      bc.lineTo(BW,bGY);bc.closePath();bc.fill();
+      bc.globalAlpha=0.15;bc.strokeStyle=night?'#203828':'#4a8a52';bc.lineWidth=1;
+      bc.beginPath();for(let hx=0;hx<=BW+5;hx+=3){const hy=bGY*0.62+Math.sin(hx*0.04)*9+Math.sin(hx*0.09)*5;if(hx===0)bc.moveTo(hx,hy);else bc.lineTo(hx,hy);}bc.stroke();
+      bc.restore();
+    }
+
+    // ── Mây (gọi hàm drawPixelCloud từ worldDraw) ─────────────
     if(!night){
-      // Cỏ xanh nhiều lớp pixel art
-      const grassLayers=[
-        {y:0,   col:'#48b030', h:PS},
-        {y:PS,  col:'#3ea028', h:PS},
-        {y:PS*2,col:'#369020', h:PS},
-        {y:PS*3,col:'#2e8018', h:PS*2},
-        {y:PS*5,col:'#286a14', h:PS},
-      ];
-      grassLayers.forEach(({y,col,h})=>{
-        bc.fillStyle=col;bc.fillRect(0,groundY2+y,BW,h);
+      bc.save();
+      [{ox:0,oy:bGY*0.10,speed:0.06,sc:0.48,alpha:0.92},{ox:160,oy:bGY*0.06,speed:0.04,sc:0.70,alpha:0.88},{ox:290,oy:bGY*0.14,speed:0.08,sc:0.38,alpha:0.85},{ox:400,oy:bGY*0.08,speed:0.05,sc:0.58,alpha:0.90}].forEach(cl=>{
+        const cx2=((cl.ox+frameCount*cl.speed*0.5)%(BW+180)+BW+180)%(BW+180)-90;
+        bc.globalAlpha=cl.alpha;
+        drawPixelCloud(bc,cx2,cl.oy+Math.sin(frameCount*0.005+cl.ox*0.003)*1.5,cl.sc,frameCount+cl.ox);
       });
-      // Ngọn cỏ pixel lắc nhẹ
-      for(let gx=0;gx<BW;gx+=PS){
-        if((gx/PS)%2===0) continue;
-        const swing=Math.round(Math.sin(frameCount*0.05+(gx*0.08))*1)*PS;
-        const gh=PS*(2+((gx/PS)%3));
-        bc.fillStyle=(gx/PS)%3===0?'#5acc3a':'#48b030';
-        bc.fillRect(gx+swing,groundY2-gh,PS,gh);
+      bc.restore();
+    }
+
+    // ── Đất + cỏ (giống drawGround) ───────────────────────────
+    {
+      const dirt=bc.createLinearGradient(0,bGY+8,0,BH);
+      dirt.addColorStop(0,night?'#2a1a08':'#8B6914');dirt.addColorStop(0.15,night?'#1e1004':'#7a5c0f');
+      dirt.addColorStop(0.4,night?'#160c02':'#6b4c0a');dirt.addColorStop(1,night?'#0e0802':'#3a2204');
+      bc.fillStyle=dirt;bc.fillRect(0,bGY+8,BW,BH-bGY-8);
+      for(let dl=0;dl<4;dl++){bc.fillStyle=`rgba(0,0,0,${0.04+dl*0.012})`;bc.fillRect(0,bGY+10+dl*6,BW,2);}
+      for(let p=0;p<16;p++){const px2=(p*139)%BW,py2=bGY+12+(p*43)%15,rs=1+p%3;bc.fillStyle=night?'rgba(80,60,30,0.3)':'rgba(160,140,90,0.35)';bc.beginPath();bc.ellipse(px2,py2,rs,rs*0.6,0,0,Math.PI*2);bc.fill();}
+      const gr=bc.createLinearGradient(0,bGY,0,bGY+10);
+      if(night){gr.addColorStop(0,'#1a3a1a');gr.addColorStop(1,'#0e2010');}
+      else{gr.addColorStop(0,'#56c45a');gr.addColorStop(0.3,'#4caf50');gr.addColorStop(1,'#388e3c');}
+      bc.fillStyle=gr;bc.fillRect(0,bGY,BW,10);
+      bc.fillStyle=night?'#1e441e':'#76c442';bc.fillRect(0,bGY,BW,2);
+      bc.fillStyle=night?'#264e26':'#96e060';bc.fillRect(0,bGY,BW,1);
+      for(let gx=0;gx<BW+4;gx+=4){
+        const seed=Math.floor(gx/4);const h=2+Math.sin(seed*7.3)*1.5;
+        const sway=Math.sin(frameCount*0.04+(gx*0.05))*1.2*(seed%3===0?1.5:0.8);
+        bc.fillStyle=night?(seed%4===0?'#2a6020':'#1e4a18'):(seed%4===0?'#a0e860':'#76c442');
+        bc.beginPath();bc.moveTo(gx,bGY);bc.lineTo(gx+sway,bGY-h);bc.lineTo(gx+1+sway*0.7,bGY-h);bc.lineTo(gx+1,bGY);bc.fill();
       }
-      // Bụi cỏ thưa trên cỏ
-      bc.fillStyle='#3ea028';
-      for(let bx=8;bx<BW;bx+=PS*6){
-        const bh=PS*2+((bx/PS)%3)*PS;
-        const bw=PS*4;
-        bc.fillRect(bx,groundY2-bh,bw,bh);
-        bc.fillStyle='#4ab82e';bc.fillRect(bx+PS,groundY2-bh-PS,PS*2,PS);bc.fillStyle='#3ea028';
-      }
-    } else {
-      const grassDarkLayers=[
-        {y:0,   col:'#183810', h:PS},
-        {y:PS,  col:'#142e0e', h:PS},
-        {y:PS*2,col:'#10260a', h:PS*2},
-        {y:PS*4,col:'#0c1e08', h:PS*2},
-      ];
-      grassDarkLayers.forEach(({y,col,h})=>{
-        bc.fillStyle=col;bc.fillRect(0,groundY2+y,BW,h);
-      });
-      // Ngọn cỏ đêm
-      for(let gx=0;gx<BW;gx+=PS){
-        if((gx/PS)%2===0) continue;
-        const swing=Math.round(Math.sin(frameCount*0.05+(gx*0.08))*1)*PS;
-        const gh=PS*(1+((gx/PS)%3));
-        bc.fillStyle='#1e3c14';
-        bc.fillRect(gx+swing,groundY2-gh,PS,gh);
+      if(!night){
+        [[55,'#ff6b9d','#ffdd00'],[130,'#ff8c00','#ffffaa'],[225,'#aa88ff','#ffeecc'],[340,'#ff4488','#ffffff'],[420,'#ee3366','#ffee88']].forEach(([fx,petCol,centCol],fi)=>{
+          if(fx>=BW)return;const bob=Math.sin(frameCount*0.06+fi)*0.8;
+          bc.fillStyle='#4a8c20';bc.fillRect(fx,bGY-4+bob,1,4);
+          bc.fillStyle=petCol;[[0,-2],[2,0],[0,2],[-2,0],[1,-1]].forEach(([px,py],i)=>{if(i<5)bc.fillRect(fx+px-1,bGY-6+bob+py-1,2,2);});
+          bc.fillStyle=centCol;bc.fillRect(fx-1,bGY-6+bob-1,2,2);
+        });
       }
     }
 
-    // ── Đất nâu pixel dưới cỏ ─────────────────────────────────
-    const dirtY=groundY2+PS*6;
-    const dirtLayers=night
-      ?[['#1e0e04',0],['#180a02',PS],['#120802',PS*2],['#0e0602',PS*3]]
-      :[['#7a4828',0],['#6a3a1c',PS],['#5c3014',PS*2],['#4e2810',PS*3],['#3e2008',PS*4]];
-    dirtLayers.forEach(([col,dy])=>{
-      bc.fillStyle=col;bc.fillRect(0,dirtY+dy,BW,PS+(dy===dirtLayers[dirtLayers.length-1][1]?BH:0));
-    });
-    // Đất fill hết xuống đáy
-    bc.fillStyle=night?'#0a0402':dirtLayers[dirtLayers.length-1][0];
-    bc.fillRect(0,dirtY+dirtLayers.length*PS,BW,BH);
+    // ── Cây (thu nhỏ drawHDTree cho battle canvas 440x130) ────
+    {
+      const td2=Math.sin(timeOfDay*Math.PI*2);
+      const bright=td2>0;
+      function drawBattleTree(rx){
+        const wSway=Math.sin(frameCount*0.03+rx*0.02)*1.2;
+        bc.save();bc.globalAlpha=0.15;bc.fillStyle='#000';bc.beginPath();bc.ellipse(rx+11,bGY+4,17+Math.abs(wSway),3,0,0,Math.PI*2);bc.fill();bc.restore();
+        bc.fillStyle='#5d4037';
+        [[rx+4,bGY+4,rx+7,bGY+1],[rx+15,bGY+4,rx+12,bGY+1]].forEach(([x1,y1,x2,y2])=>{
+          bc.beginPath();bc.moveTo(x1,y1);bc.quadraticCurveTo((x1+x2)/2+wSway*0.2,y2+2,x2,y2);bc.lineWidth=1.5;bc.strokeStyle='#5d4037';bc.stroke();
+        });
+        const tr=bc.createLinearGradient(rx+7,0,rx+13,0);
+        tr.addColorStop(0,'#8d6e63');tr.addColorStop(0.3,'#a0856a');tr.addColorStop(0.6,'#8d6e63');tr.addColorStop(1,'#5d4037');
+        bc.fillStyle=tr;bc.fillRect(rx+7+wSway*0.1,bGY-28,6,30);
+        bc.fillStyle='rgba(0,0,0,0.15)';for(let bl=0;bl<4;bl++)bc.fillRect(rx+7+bl%2*2+wSway*0.1,bGY-27+bl*6,2,1);
+        const fData=[
+          {x:11,y:-48,r:14,col:bright?'#1b5e20':'#0d3010'},{x:4,y:-40,r:11,col:bright?'#2e7d32':'#1a4820'},
+          {x:18,y:-38,r:10,col:bright?'#2e7d32':'#1a4820'},{x:11,y:-55,r:12,col:bright?'#388e3c':'#204a22'},
+          {x:3,y:-45,r:10,col:bright?'#43a047':'#2a5a2e'},{x:19,y:-43,r:10,col:bright?'#388e3c':'#204a22'},
+          {x:11,y:-34,r:14,col:bright?'#33691e':'#1c3b10'},{x:5,y:-32,r:10,col:bright?'#388e3c':'#204a22'},
+          {x:17,y:-32,r:9,col:bright?'#2e7d32':'#1a4820'},{x:7,y:-52,r:7,col:bright?'#4caf50':'#2a6030'},
+          {x:15,y:-47,r:6,col:bright?'#43a047':'#265028'},
+        ];
+        const sw=wSway*0.5;
+        fData.forEach((f,i)=>{const ls=sw*(i<3?0.5:i<9?0.8:1.1);bc.fillStyle=f.col;bc.beginPath();bc.arc(rx+f.x+ls,bGY+f.y,f.r,0,Math.PI*2);bc.fill();});
+        bc.save();bc.globalAlpha=0.35+td2*0.1;bc.fillStyle='#76c442';
+        [[8,-52,6],[15,-44,4],[6,-38,4]].forEach(([lx,ly,lr])=>{bc.beginPath();bc.arc(rx+lx+sw,bGY+ly,lr,0,Math.PI*2);bc.fill();});
+        bc.globalAlpha=0.15;bc.fillStyle='#c8f098';bc.beginPath();bc.arc(rx+9+sw,bGY-55,3,0,Math.PI*2);bc.fill();bc.restore();
+        [['#e53935',16,-38],['#c62828',6,-30],['#ef5350',12,-28]].forEach(([col,fx,fy])=>{bc.fillStyle=col;bc.beginPath();bc.arc(rx+fx+sw*0.7,bGY+fy,1.5,0,Math.PI*2);bc.fill();});
+      }
+      drawBattleTree(18);    // Cây trái
+      drawBattleTree(392);   // Cây phải
+      // Cây giữa nhỏ hơn
+      bc.save();bc.translate(Math.round(BW*0.46),0);bc.scale(0.72,0.72);bc.translate(-Math.round(BW*0.46/0.72),0);
+      drawBattleTree(Math.round(BW*0.46/0.72));bc.restore();
+    }
 
-    bc.restore();
+    // ── Đá ────────────────────────────────────────────────────
+    {
+      bc.save();
+      const S=0.52;bc.scale(S,S);
+      const sy=bGY/S;
+      function _bRS(x,y,w,h){if(w<=0||h<=0)return;x=Math.round(x);y=Math.round(y);w=Math.round(w);h=Math.round(h);bc.beginPath();bc.moveTo(x+w*0.2,y);bc.lineTo(x+w*0.55,y);bc.lineTo(x+w*0.78,y+h*0.06);bc.lineTo(x+w,y+h*0.3);bc.lineTo(x+w*0.92,y+h*0.7);bc.lineTo(x+w*0.72,y+h);bc.lineTo(x+w*0.28,y+h);bc.lineTo(x+w*0.06,y+h*0.72);bc.lineTo(x,y+h*0.38);bc.lineTo(x+w*0.08,y+h*0.12);bc.closePath();bc.fill();}
+      function bRock(rx,rw,rh){
+        bc.save();bc.globalAlpha=0.18;bc.fillStyle='#000';bc.beginPath();bc.ellipse(rx+rw/2,sy+3,rw*0.5,3,0,0,Math.PI*2);bc.fill();bc.restore();
+        bc.fillStyle='#3a4a58';_bRS(rx-1,sy-rh-1,rw+2,rh+2);bc.fillStyle='#4a5a6a';_bRS(rx,sy-rh+rh*0.45,rw,rh*0.55);
+        bc.fillStyle='#7a8ea0';_bRS(rx,sy-rh,rw,rh*0.8);bc.fillStyle='#96aabf';_bRS(rx+rw*0.1,sy-rh,rw*0.8,rh*0.55);
+        bc.fillStyle='#b8ccd8';_bRS(rx+rw*0.12,sy-rh+rh*0.08,rw*0.55,rh*0.38);
+        bc.fillStyle='#d8eaf4';bc.fillRect(Math.round(rx+rw*0.14),Math.round(sy-rh+rh*0.1),Math.round(rw*0.22),Math.round(rh*0.16));
+        bc.fillStyle='#3a4a58';bc.fillRect(Math.round(rx+rw*0.56),Math.round(sy-rh+rh*0.22),1,Math.round(rh*0.18));
+        bc.fillStyle='#4a7a30';for(let m=0;m<3;m++)bc.fillRect(Math.round(rx+rw*(0.2+m*0.22)),Math.round(sy-rh+rh*0.85),2,2);
+      }
+      bRock(Math.round(BW*0.28/S),34,24);
+      bRock(Math.round(BW*0.55/S),22,16);
+      bc.restore();
+    }
   }
+
 
   // ── ATTACK ANIMATIONS (weapon-specific) ─────────────────
   if(atk){

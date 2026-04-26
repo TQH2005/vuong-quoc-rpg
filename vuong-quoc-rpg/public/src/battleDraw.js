@@ -428,11 +428,11 @@ function drawBattleScene(atk,def,animType){
       bc.fillStyle=fg2;bc.beginPath();bc.arc(fbX,fbY,28,0,Math.PI*2);bc.fill();
       bc.restore();
 
-      // ── Impact flash on monster ─────────────────────────────
+      // ── Impact flash on player ──────────────────────────────
       bc.save();bc.globalAlpha=0.45;
-      const impG=bc.createRadialGradient(300,70,3,270,80,38);
+      const impG=bc.createRadialGradient(75,70,3,75,80,38);
       impG.addColorStop(0,'#ffee00');impG.addColorStop(0.3,'#ff6600');impG.addColorStop(1,'transparent');
-      bc.fillStyle=impG;bc.beginPath();bc.arc(300,70,38,0,Math.PI*2);bc.fill();
+      bc.fillStyle=impG;bc.beginPath();bc.arc(75,70,38,0,Math.PI*2);bc.fill();
       bc.restore();
 
       // Burn label (disabled - replaced by red tint)

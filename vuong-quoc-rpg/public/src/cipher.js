@@ -82,6 +82,3 @@ setInterval(()=>{
     }
   }, 200);
 })();
-</script>
-</body>
-</html

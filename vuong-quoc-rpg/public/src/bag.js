@@ -397,3 +397,5 @@ function refreshBagEquipBar(){
   const meleeEl=document.getElementById('bag-eq-melee');
   const magicEl=document.getElementById('bag-eq-magic');
   if(meleeEl) meleeEl.textContent=equippedMelee?equippedMelee.icon+' '+equippedMelee.name:'—';
+if(magicEl) magicEl.textContent=equippedMagic?equippedMagic.icon+' '+equippedMagic.name:'—';
+}

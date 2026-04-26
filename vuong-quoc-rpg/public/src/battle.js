@@ -1,6 +1,5 @@
   if(magicEl) magicEl.textContent=equippedMagic?equippedMagic.icon+' '+equippedMagic.name:'—';
   document.getElementById('bag-eq-armor').textContent=equippedArmor?equippedArmor.icon+' '+equippedArmor.name:'—';
-}
 function renderBagSections(){
   const sec=document.getElementById('bag-sections');
   sec.innerHTML='';

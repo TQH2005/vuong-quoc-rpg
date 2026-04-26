@@ -945,6 +945,7 @@ function renderWorld(){
     const isNightOnly=m.nightOnly;
     if((isShadowDragon||isNightOnly)&&!isNightTime()) return; // skip night-only during day
     if(dist<80&&gameState==='WORLD'){
+      window._nearMon = m;
       ctx.save();ctx.globalAlpha=0.9;
       ctx.fillStyle=night?'rgba(80,0,0,0.9)':'rgba(0,0,0,0.8)';ctx.fillRect(rx-5,ry-22,m.w+10,12);
       ctx.fillStyle=night?'#ff4444':'#ff8a65';ctx.font='bold 15px "Times New Roman"';ctx.textAlign='center';
@@ -1003,6 +1004,7 @@ function renderWorld(){
     ctx.fillRect(hx,MM_Y+2,4,MM_H-4);
   });
   // Monsters on minimap
+  window._nearMon = null;
   monsters.forEach(m=>{
     if(!m.alive)return;
     if(m.type==='dragon_shadow'&&!isNightTime())return;

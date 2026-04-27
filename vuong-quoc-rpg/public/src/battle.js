@@ -913,21 +913,7 @@ function endBattle(won,rw){
   document.getElementById('shadow-debuff-tag').classList.remove('on');
   document.getElementById('soul-state-tag').classList.remove('on');
 
-  // ── Underground battles — fully handled here, no fallthrough ──
-  const isUGBattle = undergroundActive && bMon && bMon.id && bMon.id.startsWith('ug_');
-  if(isUGBattle){
-    const nightBonus=isNightTime()?Math.round(rw*0.5):0;
-    const diffMult=[0,1.05,1.15,1.30,1.60,2.20][battleDiff]||1;
-    const finalRw=won?Math.round((rw+nightBonus)*diffMult):0;
-    if(won){ coins+=finalRw; updateHUD(); }
-    else { if(playerHP<=0) playerHP=Math.floor(playerMaxHP*0.3); }
-    setBLog(won?'🏆 THẮNG! +'+finalRw+' 🪙':'💀 Bạn đã thua...');
-    document.getElementById('battle').classList.remove('on');
-    _onUGBattleEnd(won);
-    return;
-  }
-
-  // Fire dragon: 6 giây lửa thiêu đốt trước khi thoát
+  // Fire dragon: 6 giây lửa thiêu đốt trước khi thoát (phải check TRƯỚC isUGBattle)
   if(won && bMon && bMon.type==='fire_dragon'){
     undergroundFireDragonDefeated=true;
     window._fireDragonDeathAnim=true;
@@ -979,6 +965,20 @@ function endBattle(won,rw){
         }
       }
     },1000);
+    return;
+  }
+
+  // ── Underground battles — fully handled here, no fallthrough ──
+  const isUGBattle = undergroundActive && bMon && bMon.id && bMon.id.startsWith('ug_');
+  if(isUGBattle){
+    const nightBonus=isNightTime()?Math.round(rw*0.5):0;
+    const diffMult=[0,1.05,1.15,1.30,1.60,2.20][battleDiff]||1;
+    const finalRw=won?Math.round((rw+nightBonus)*diffMult):0;
+    if(won){ coins+=finalRw; updateHUD(); }
+    else { if(playerHP<=0) playerHP=Math.floor(playerMaxHP*0.3); }
+    setBLog(won?'🏆 THẮNG! +'+finalRw+' 🪙':'💀 Bạn đã thua...');
+    document.getElementById('battle').classList.remove('on');
+    _onUGBattleEnd(won);
     return;
   }
 

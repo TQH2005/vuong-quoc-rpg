@@ -974,3 +974,33 @@ function updateBHUD(){
   if(magicBtn) magicBtn.style.opacity=playerMana>=manaCost?'1':'0.4';
 }
 function setBLog(t){const el=document.getElementById('b-log');el.innerHTML+='<div>'+t+'</div>';el.scrollTop=el.scrollHeight;}
+// ── Patch: vẽ lửa death anim (được gọi từ gameLoop) ──
+const _origDrawBattleScene = drawBattleScene;
+drawBattleScene = function(atk,def,animType){
+  _origDrawBattleScene(atk,def,animType);
+  if(!window._fireDragonDeathAnim) return;
+  const bc=bctx; const BW=bcv.width; const BH=bcv.height;
+  const t=frameCount;
+  const cols=Math.ceil(BW/18)+1;
+  for(let i=0;i<cols;i++){
+    const fx=i*18+Math.sin(t*0.08+i*0.7)*6;
+    const flameH=BH*(0.4+0.6*Math.abs(Math.sin(t*0.05+i*1.3)));
+    const fy=BH-flameH;
+    const grad=bc.createLinearGradient(fx,BH,fx,fy);
+    grad.addColorStop(0,'rgba(255,30,0,0.95)');
+    grad.addColorStop(0.3,'rgba(255,120,0,0.85)');
+    grad.addColorStop(0.6,'rgba(255,200,0,0.6)');
+    grad.addColorStop(1,'rgba(255,255,100,0)');
+    bc.fillStyle=grad;
+    bc.beginPath();
+    const w2=9+Math.sin(t*0.12+i)*4;
+    bc.moveTo(fx,BH);
+    bc.quadraticCurveTo(fx+w2,fy+flameH*0.5,fx+w2*0.5,fy);
+    bc.quadraticCurveTo(fx-w2*0.3,fy+flameH*0.4,fx-w2*0.2,BH);
+    bc.closePath();bc.fill();
+  }
+  bc.save();bc.globalAlpha=0.18+0.1*Math.sin(t*0.3);bc.fillStyle='#ff2200';bc.fillRect(0,0,BW,BH);bc.restore();
+  bc.save();bc.globalAlpha=0.7+0.3*Math.sin(t*0.25);bc.fillStyle='#ffdd00';bc.shadowColor='#ff4400';bc.shadowBlur=20;
+  bc.font='bold 16px "Cinzel",serif';bc.textAlign='center';
+  bc.fillText('🔥 LỬA ĐỊA NGỤC 🔥',BW/2,BH/2-10);bc.restore();
+};

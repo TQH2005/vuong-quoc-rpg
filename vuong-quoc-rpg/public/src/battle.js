@@ -927,13 +927,58 @@ function endBattle(won,rw){
     return;
   }
 
-  // Fire dragon: exit underground
+  // Fire dragon: 6 giây lửa thiêu đốt trước khi thoát
   if(won && bMon && bMon.type==='fire_dragon'){
     undergroundFireDragonDefeated=true;
-    document.getElementById('battle').classList.remove('on');
-    const _gc=document.getElementById('gc');
-    if(_gc) _gc.style.visibility='visible';
-    _onUGBattleEnd(true);
+    window._fireDragonDeathAnim=true;
+    setBLog('🔥 HỎA LONG VƯƠNG bị tiêu diệt! Lửa địa ngục thiêu đốt tất cả!');
+    // Vô hiệu hoá các nút battle
+    ['btn-atk','btn-magic','btn-item','btn-flee'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.disabled=true;
+    });
+    let elapsed=0;
+    const burnInterval=setInterval(()=>{
+      elapsed++;
+      if(elapsed<=5){
+        // 5 giây đầu: đốt 15 máu/giây
+        playerHP=Math.max(0,playerHP-15);
+        updateBHUD();updateHUD();
+        setBLog('🔥 Lửa địa ngục thiêu đốt! -15 HP! ('+elapsed+'/5 giây) | HP còn: '+playerHP);
+      } else {
+        // Giây thứ 6: dừng đốt, xét thắng/thua
+        clearInterval(burnInterval);
+        window._fireDragonDeathAnim=false;
+        ['btn-atk','btn-magic','btn-item','btn-flee'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el) el.disabled=false;
+        });
+        if(playerHP<=0){
+          // Thua vì bị thiêu chết
+          playerHP=Math.floor(playerMaxHP*0.3);
+          setBLog('💀 Bạn bị Hỏa Long Vương thiêu rụi!');
+          setTimeout(()=>{
+            document.getElementById('battle').classList.remove('on');
+            const _gc=document.getElementById('gc');
+            if(_gc) _gc.style.visibility='visible';
+            gameState='WORLD';updateHUD();
+            showNotif('💀 Bị Hỏa Long Vương thiêu rụi!');
+            _onUGBattleEnd(false);
+          },1000);
+        } else {
+          // Thắng
+          setBLog('🏆 Vượt qua lửa địa ngục! Hỏa Long Vương đã bị tiêu diệt!');
+          setTimeout(()=>{
+            document.getElementById('battle').classList.remove('on');
+            const _gc=document.getElementById('gc');
+            if(_gc) _gc.style.visibility='visible';
+            gameState='WORLD';updateHUD();
+            showNotif('🏆 Hỏa Long Vương bị tiêu diệt!');
+            _onUGBattleEnd(true);
+          },1000);
+        }
+      }
+    },1000);
     return;
   }
 

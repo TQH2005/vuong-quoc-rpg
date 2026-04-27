@@ -213,14 +213,14 @@
       <div class="b-top">
         <div class="b-ent">
           <div class="b-name">HIỆP SĨ</div>
-          <div class="b-hprow">❤<div class="b-hpbg"><div class="b-hpbar" id="b-php" style="width:100%;background:linear-gradient(90deg,#2ecc40,#57ff6e);box-shadow:0 0 8px #2ecc40"></div></div><span style="font-size:6px;color:white;font-family:'Times New Roman'" id="b-php-n">100</span></div>
-          <div class="b-hprow" style="margin-top:3px">💧<div class="b-hpbg" style="background:#00001a;border-color:#336"><div class="b-hpbar" id="b-mp-fill" style="width:100%;background:linear-gradient(90deg,#2196f3,#64b5f6);box-shadow:0 0 6px #2196f3"></div></div><span style="font-size:6px;color:#64b5f6;font-family:'Times New Roman'" id="b-mp-txt">80</span></div>
-          <div id="b-armor-info" style="font-size:5px;color:#00bcd4;font-family:'Times New Roman';margin-top:1px"></div>
+          <div class="b-hprow">❤<div class="b-hpbg"><div class="b-hpbar" id="b-php" style="width:100%;background:linear-gradient(90deg,#2ecc40,#57ff6e);box-shadow:0 0 8px #2ecc40"></div></div><span style="font-size:13px;color:white;font-family:'Times New Roman'" id="b-php-n">100</span></div>
+          <div class="b-hprow" style="margin-top:5px">💧<div class="b-hpbg" style="background:#00001a;border-color:#336"><div class="b-hpbar" id="b-mp-fill" style="width:100%;background:linear-gradient(90deg,#2196f3,#64b5f6);box-shadow:0 0 6px #2196f3"></div></div><span style="font-size:13px;color:#64b5f6;font-family:'Times New Roman'" id="b-mp-txt">80</span></div>
+          <div id="b-armor-info" style="font-size:11px;color:#00bcd4;font-family:'Times New Roman';margin-top:3px"></div>
         </div>
-        <div style="font-family:'Times New Roman','IM Fell English',serif;color:var(--gold);font-size:14px;letter-spacing:2px">VS</div>
+        <div style="font-family:'Times New Roman','IM Fell English',serif;color:var(--gold);font-size:20px;letter-spacing:4px">VS</div>
         <div class="b-ent" style="text-align:right">
           <div class="b-name" id="b-mname">QUÁI VẬT</div>
-          <div class="b-hprow" style="justify-content:flex-end"><span style="font-size:6px;color:white;font-family:'Times New Roman'" id="b-mhp-n">50</span><div class="b-hpbg"><div class="b-hpbar" id="b-mhp" style="width:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);box-shadow:0 0 8px #e74c3c"></div></div>💚</div>
+          <div class="b-hprow" style="justify-content:flex-end"><span style="font-size:13px;color:white;font-family:'Times New Roman'" id="b-mhp-n">50</span><div class="b-hpbg"><div class="b-hpbar" id="b-mhp" style="width:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);box-shadow:0 0 8px #e74c3c"></div></div>💚</div>
         </div>
       </div>
       <div id="battle-quiz-overlay">
@@ -228,12 +228,12 @@
         <div class="bq-question" id="bq-question"></div>
         <div class="bq-opts" id="bq-opts"></div>
       </div>
-      <canvas id="b-canvas" width="440" height="130"></canvas>
-      <canvas id="fx-canvas" width="440" height="130" style="position:absolute;inset:0;pointer-events:none;image-rendering:pixelated;"></canvas>
+      <canvas id="b-canvas" width="1250" height="416"></canvas>
+      <canvas id="fx-canvas" width="1250" height="416" style="position:absolute;inset:0;pointer-events:none;image-rendering:pixelated;"></canvas>
       <div id="b-log"></div>
       <div class="bbtns">
         <button class="bbtn bbtn-a" onclick="doB('attack')">⚔ ĐÁNH</button>
-        <button class="bbtn bbtn-m" onclick="doB('magic')">✨ PHÉP <span id="b-mana-cost" style="font-size:5px;opacity:0.8">(-28MP)</span></button>
+        <button class="bbtn bbtn-m" onclick="doB('magic')">✨ PHÉP <span id="b-mana-cost" style="font-size:11px;opacity:0.8">(-28MP)</span></button>
         <button class="bbtn bbtn-hp" onclick="doB('hppot')" style="border-color:#e74c3c;color:#e74c3c;">🧪 BÌNH MÁU (<span id="b-hppot">0</span>)</button>
         <button class="bbtn bbtn-mp2" onclick="doB('manapot')" style="border-color:#2196f3;color:#2196f3;">💧 BÌNH MANA (<span id="b-manapot">0</span>)</button>
         <button class="bbtn bbtn-r" onclick="doB('flee')">↩ CHẠY</button>

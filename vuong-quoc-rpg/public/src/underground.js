@@ -524,7 +524,8 @@ function _drawUGRoom(){
   ugCtx.save();
   if(UP.hurtAnim>0){ugCtx.globalAlpha=0.5+Math.sin(UP.hurtAnim*0.5)*0.5;}
   // Draw player using main drawKnight function
-  drawKnight(ugCtx,prx,UP.y,UP.facing<0,UP.vx,UP.attackAnim>0,false);
+  const ugWalking=Math.abs(UP.vx)>0.3&&UP.onGround;
+  drawKnight(ugCtx,prx,UP.y,UP.facing<0,ugWalking,ugFrame,false);
   ugCtx.restore();
 
   // ── Hell floor 10 extra effects ─────────────────────────────

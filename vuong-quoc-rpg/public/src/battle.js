@@ -190,6 +190,11 @@ function startBattle(m){
   updateBHUD();setBLog(logMsg);
   drawBattleScene(0,0);gameState='BATTLE';
   document.getElementById('battle').classList.add('on');
+  // Ẩn world canvas và underground overlay để tránh lửa/hiệu ứng lộ ra sau battle
+  const _gc=document.getElementById('gc');
+  const _ugOv=document.getElementById('underground-overlay');
+  if(_gc) _gc.style.visibility='hidden';
+  if(_ugOv) _ugOv.classList.remove('on');
   document.querySelectorAll('.bbtn').forEach(b=>b.disabled=false);
   // Show armor info in battle
   const armorEl=document.getElementById('b-armor-info');
@@ -942,6 +947,9 @@ function endBattle(won,rw){
   }else{if(playerHP<=0)playerHP=Math.floor(playerMaxHP*0.3);setBLog('💀 Bạn đã thua...');}
   setTimeout(()=>{
     document.getElementById('battle').classList.remove('on');
+    // Hiện lại world canvas
+    const _gc=document.getElementById('gc');
+    if(_gc) _gc.style.visibility='visible';
     gameState='WORLD';updateHUD();
     showNotif(won?'🏆 Chiến thắng! +'+finalRw+' 🪙':'Đã thoát trận chiến');
   },1500);

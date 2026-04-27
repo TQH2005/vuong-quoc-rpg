@@ -931,6 +931,8 @@ function endBattle(won,rw){
   if(won && bMon && bMon.type==='fire_dragon'){
     undergroundFireDragonDefeated=true;
     document.getElementById('battle').classList.remove('on');
+    const _gc=document.getElementById('gc');
+    if(_gc) _gc.style.visibility='visible';
     _onUGBattleEnd(true);
     return;
   }

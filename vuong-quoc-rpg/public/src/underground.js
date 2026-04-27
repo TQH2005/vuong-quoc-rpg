@@ -56,6 +56,10 @@ function exitUnderground(){
   document.getElementById('underground-overlay').classList.remove('on');
   gameState='WORLD';
   if(ugAnimId){ cancelAnimationFrame(ugAnimId); ugAnimId=null; }
+  // Đảm bảo world canvas hiện lại
+  const _gc=document.getElementById('gc');
+  if(_gc) _gc.style.visibility='visible';
+  updateHUD();
 }
 
 // ── Spawn room monster ───────────────────────────────────────
@@ -91,8 +95,11 @@ function _spawnUGMonster(){
 function _advanceUGFloor(){
   if(undergroundFloor>=10){
     // Floor 10 cleared — fire dragon defeated
-    undergroundActive=false;
-    setTimeout(()=>{ exitUnderground(); showNotif('🏆 Bạn đã chinh phục lòng đất! Thoát lên mặt đất!'); },1500);
+    // Không set undergroundActive=false ở đây — để _onUGBattleEnd xử lý
+    setTimeout(()=>{
+      exitUnderground();
+      showNotif('🏆 Bạn đã chinh phục lòng đất! Thoát lên mặt đất!');
+    },1500);
     return;
   }
   undergroundFloor++;

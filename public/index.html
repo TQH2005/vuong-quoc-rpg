@@ -14,26 +14,31 @@
   <div class="lg-logo">⚔️</div>
   <div class="lg-title">VƯƠNG QUỐC TRI THỨC</div>
 
-  <!-- ── PANEL CHỌN CHỨC VỤ (màn đầu tiên) ── -->
+  <!-- ── PANEL CHỌN VAI TRÒ ── -->
   <div id="lg-role-panel">
-    <div class="lg-sub">— CHỌN CHỨC VỤ CỦA BẠN —</div>
+    <div class="lg-sub">— CHỌN VAI TRÒ CỦA BẠN —</div>
     <div class="lg-role-cards">
       <div class="lg-role-card" onclick="selectRole('student')">
         <div class="lg-role-icon">🧑‍🎓</div>
         <div class="lg-role-name">Học Sinh</div>
-        <div class="lg-role-desc">Đăng nhập &amp; đăng ký<br>tài khoản học sinh</div>
+        <div class="lg-role-desc">Đăng nhập vào<br>trò chơi học tập</div>
       </div>
       <div class="lg-role-card" onclick="selectRole('teacher')">
         <div class="lg-role-icon">👨‍🏫</div>
-        <div class="lg-role-name">Giảng Viên</div>
-        <div class="lg-role-desc">Đăng nhập &amp; đăng ký<br>tài khoản giảng viên</div>
+        <div class="lg-role-name">Giáo Viên</div>
+        <div class="lg-role-desc">Quản lý lớp học<br>& bảng xếp hạng</div>
+      </div>
+      <div class="lg-role-card" onclick="selectRole('parent')">
+        <div class="lg-role-icon">👨‍👩‍👧</div>
+        <div class="lg-role-name">Phụ Huynh</div>
+        <div class="lg-role-desc">Theo dõi tiến độ<br>học tập của con</div>
       </div>
     </div>
   </div>
 
-  <!-- ── ĐĂNG NHẬP (dùng chung học sinh + giảng viên) ── -->
-  <div id="lg-login-panel" style="display:none">
-    <div class="lg-sub" id="lg-login-title">— ĐĂNG NHẬP ĐỂ TIẾP TỤC —</div>
+  <!-- ── ĐĂNG NHẬP HỌC SINH ── -->
+  <div id="lg-student-login-panel" style="display:none">
+    <div class="lg-sub">🧑‍🎓 — ĐĂNG NHẬP HỌC SINH —</div>
     <div class="lg-box">
       <div>
         <div class="lg-lbl">👤 Tài khoản</div>
@@ -43,182 +48,123 @@
         <div class="lg-lbl">🔒 Mật khẩu</div>
         <input class="lg-inp" id="lg-pass" type="password" placeholder="Nhập mật khẩu..."/>
       </div>
-      <div>
-        <div class="lg-lbl">🏫 Mã lớp học</div>
-        <input class="lg-inp" id="lg-class" type="text" placeholder="Nhập mã lớp học..." autocomplete="off" spellcheck="false"/>
-      </div>
-      <div>
-        <div class="lg-lbl">🎭 Chức vụ</div>
-        <select class="lg-inp lg-select" id="lg-role-select">
-          <option value="student">🧑‍🎓 Học Sinh</option>
-          <option value="teacher">👨‍🏫 Giảng Viên</option>
-        </select>
-      </div>
-      <div id="lg-err">❌ Tài khoản hoặc mật khẩu không đúng!</div>
-      <button class="lg-btn" id="lg-btn" onclick="doLogin()">▶ &nbsp;VÀO GAME</button>
+      <div id="lg-err" class="lg-msg-err"></div>
+      <button class="lg-btn" id="lg-btn" onclick="doLogin()">⚔️ &nbsp;VÀO GAME</button>
       <div class="lg-toggle-row">
-        <span onclick="showRoleSelect()">← Quay lại</span>
-        <span onclick="showRegister()">Đăng ký tài khoản</span>
+        <span onclick="showRolePanel()">← Quay lại</span>
+        <span onclick="showStudentRegister()">Đăng ký tài khoản mới</span>
       </div>
     </div>
   </div>
 
   <!-- ── ĐĂNG KÝ HỌC SINH ── -->
-  <div id="lg-register-panel" style="display:none">
-    <div class="lg-sub">— TẠO TÀI KHOẢN HỌC SINH —</div>
+  <div id="lg-student-register-panel" style="display:none">
+    <div class="lg-sub">📜 — TẠO TÀI KHOẢN HỌC SINH —</div>
     <div class="lg-box" style="gap:10px;">
       <div>
-        <div class="lg-lbl">👤 Họ và tên</div>
-        <input class="lg-inp" id="rg-name" type="text" placeholder="Nhập họ và tên..." autocomplete="off" spellcheck="false"/>
+        <div class="lg-lbl">👤 Họ và tên thật</div>
+        <input class="lg-inp" id="rg-name" type="text" placeholder="Nguyễn Văn A..." autocomplete="off" spellcheck="false"/>
       </div>
       <div>
         <div class="lg-lbl">🎂 Năm sinh</div>
-        <input class="lg-inp" id="rg-born" type="number" placeholder="VD: 2010" min="1990" max="2020"/>
+        <input class="lg-inp" id="rg-born" type="number" placeholder="VD: 2015" min="2000" max="2020"/>
       </div>
       <div>
-        <div class="lg-lbl">📱 Số điện thoại</div>
-        <input class="lg-inp" id="rg-phone" type="tel" placeholder="VD: 0912345678" autocomplete="off"/>
-      </div>
-      <div>
-        <div class="lg-lbl">🏫 Mã lớp học</div>
-        <input class="lg-inp" id="rg-class" type="text" placeholder="Nhập mã lớp học..." autocomplete="off" spellcheck="false"/>
+        <div class="lg-lbl">🏫 Mã lớp học <span style="color:#aaa;font-size:11px">(hỏi giáo viên)</span></div>
+        <input class="lg-inp" id="rg-class" type="text" placeholder="VD: ABC123" autocomplete="off" spellcheck="false" style="text-transform:uppercase"/>
       </div>
       <div>
         <div class="lg-lbl">🔑 Tên tài khoản</div>
         <input class="lg-inp" id="rg-user" type="text" placeholder="Tên đăng nhập..." autocomplete="off" spellcheck="false"/>
       </div>
       <div>
-        <div class="lg-lbl">🔒 Đặt mật khẩu</div>
-        <input class="lg-inp" id="rg-pass" type="password" placeholder="Nhập mật khẩu..."/>
+        <div class="lg-lbl">🔒 Mật khẩu</div>
+        <input class="lg-inp" id="rg-pass" type="password" placeholder="Tối thiểu 4 ký tự..."/>
       </div>
       <div>
         <div class="lg-lbl">🔒 Xác nhận mật khẩu</div>
         <input class="lg-inp" id="rg-pass2" type="password" placeholder="Nhập lại mật khẩu..."/>
       </div>
-      <div id="lg-reg-err">❌ Lỗi đăng ký!</div>
-      <div id="lg-reg-ok">✅ Đăng ký thành công!</div>
+      <div id="lg-reg-err" class="lg-msg-err"></div>
+      <div id="lg-reg-ok" class="lg-msg-ok"></div>
       <button class="lg-btn" id="rg-btn" onclick="doRegister()">📜 &nbsp;ĐĂNG KÝ</button>
       <div class="lg-toggle-row">
-        <span onclick="showLogin()">← Quay lại đăng nhập</span>
-        <span onclick="showTeacherRegister()">Đăng ký giảng viên</span>
+        <span onclick="showStudentLogin()">← Đã có tài khoản</span>
       </div>
     </div>
   </div>
 
-  <!-- ── ĐĂNG KÝ GIẢNG VIÊN ── -->
+  <!-- ── ĐĂNG NHẬP GIÁO VIÊN ── -->
+  <div id="lg-teacher-login-panel" style="display:none">
+    <div class="lg-sub">👨‍🏫 — ĐĂNG NHẬP GIÁO VIÊN —</div>
+    <div class="lg-box">
+      <div>
+        <div class="lg-lbl">👤 Tài khoản giáo viên</div>
+        <input class="lg-inp" id="tc-user" type="text" placeholder="Nhập tài khoản..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔒 Mật khẩu</div>
+        <input class="lg-inp" id="tc-pass" type="password" placeholder="Nhập mật khẩu..."/>
+      </div>
+      <div id="tc-err" class="lg-msg-err"></div>
+      <button class="lg-btn" id="tc-btn" onclick="doTeacherLogin()">👨‍🏫 &nbsp;VÀO BẢNG QUẢN LÝ</button>
+      <div class="lg-toggle-row">
+        <span onclick="showRolePanel()">← Quay lại</span>
+        <span onclick="showTeacherRegister()">Đăng ký tài khoản GV</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ĐĂNG KÝ GIÁO VIÊN ── -->
   <div id="lg-teacher-register-panel" style="display:none">
-    <div class="lg-sub">— TẠO TÀI KHOẢN GIẢNG VIÊN —</div>
+    <div class="lg-sub">📋 — TẠO TÀI KHOẢN GIÁO VIÊN —</div>
     <div class="lg-box" style="gap:10px;">
       <div>
         <div class="lg-lbl">👤 Họ và tên</div>
-        <input class="lg-inp" id="tr-name" type="text" placeholder="Nhập họ và tên..." autocomplete="off" spellcheck="false"/>
-      </div>
-      <div>
-        <div class="lg-lbl">📱 Số điện thoại</div>
-        <input class="lg-inp" id="tr-phone" type="tel" placeholder="VD: 0912345678" autocomplete="off"/>
-      </div>
-      <div>
-        <div class="lg-lbl">🏫 Mã lớp học (tạo mới)</div>
-        <input class="lg-inp" id="tr-class" type="text" placeholder="VD: TOAN10A1..." autocomplete="off" spellcheck="false"/>
+        <input class="lg-inp" id="tr-name" type="text" placeholder="Nguyễn Thị B..." autocomplete="off" spellcheck="false"/>
       </div>
       <div>
         <div class="lg-lbl">🔑 Tên tài khoản</div>
         <input class="lg-inp" id="tr-user" type="text" placeholder="Tên đăng nhập..." autocomplete="off" spellcheck="false"/>
       </div>
       <div>
-        <div class="lg-lbl">🔒 Đặt mật khẩu</div>
-        <input class="lg-inp" id="tr-pass" type="password" placeholder="Nhập mật khẩu..."/>
+        <div class="lg-lbl">🔒 Mật khẩu</div>
+        <input class="lg-inp" id="tr-pass" type="password" placeholder="Tối thiểu 6 ký tự..."/>
       </div>
       <div>
         <div class="lg-lbl">🔒 Xác nhận mật khẩu</div>
         <input class="lg-inp" id="tr-pass2" type="password" placeholder="Nhập lại mật khẩu..."/>
       </div>
-      <div id="lg-tr-err">❌ Lỗi đăng ký!</div>
-      <div id="lg-tr-ok">✅ Đăng ký thành công!</div>
-      <button class="lg-btn lg-btn-teacher" id="tr-btn" onclick="doTeacherRegister()">🎓 &nbsp;ĐĂNG KÝ GIẢNG VIÊN</button>
+      <div id="tr-err" class="lg-msg-err"></div>
+      <div id="tr-ok" class="lg-msg-ok"></div>
+      <button class="lg-btn" id="tr-btn" onclick="doTeacherRegister()">📋 &nbsp;ĐĂNG KÝ</button>
       <div class="lg-toggle-row">
-        <span onclick="showLogin()">← Quay lại đăng nhập</span>
-        <span onclick="showRegister()">Đăng ký học sinh</span>
+        <span onclick="showTeacherLogin()">← Đã có tài khoản</span>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ═══ TEACHER DASHBOARD ═══ -->
-<div id="teacher-dashboard">
-  <div class="td-header">
-    <div class="td-header-left">
-      <div class="td-logo">👨‍🏫</div>
+  <!-- ── PHỤ HUYNH ── -->
+  <div id="lg-parent-panel" style="display:none">
+    <div class="lg-sub">👨‍👩‍👧 — THEO DÕI TIẾN ĐỘ HỌC TẬP —</div>
+    <div class="lg-box">
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:40px;margin-bottom:10px">🔍</div>
+        <div class="lg-lbl" style="text-align:center">Nhập mã lớp học của con để xem bảng xếp hạng</div>
+      </div>
       <div>
-        <div class="td-title">BẢNG QUẢN LÝ LỚP HỌC</div>
-        <div class="td-subtitle" id="td-subtitle">Vương Quốc Tri Thức</div>
+        <div class="lg-lbl">🏫 Mã lớp học của con</div>
+        <input class="lg-inp" id="ph-class" type="text" placeholder="VD: ABC123" style="text-transform:uppercase" autocomplete="off"/>
       </div>
-    </div>
-    <div class="td-header-right">
-      <div class="td-class-badge">🏫 Lớp: <span id="td-classid">—</span></div>
-      <div class="td-teacher-name" id="td-teacher-name">—</div>
-      <button class="td-logout-btn" onclick="teacherLogout()">🚪 Đăng xuất</button>
+      <div id="ph-err" class="lg-msg-err"></div>
+      <button class="lg-btn" onclick="doParentView()">🔍 &nbsp;XEM BẢNG XẾP HẠNG</button>
+      <div class="lg-toggle-row">
+        <span onclick="showRolePanel()">← Quay lại</span>
+      </div>
     </div>
   </div>
 
-  <div class="td-body">
-    <div class="td-stats-row">
-      <div class="td-stat-card">
-        <div class="td-stat-icon">👥</div>
-        <div class="td-stat-num" id="td-total">0</div>
-        <div class="td-stat-lbl">Học sinh</div>
-      </div>
-      <div class="td-stat-card">
-        <div class="td-stat-icon">⭐</div>
-        <div class="td-stat-num" id="td-avg-lv">—</div>
-        <div class="td-stat-lbl">Level TB</div>
-      </div>
-      <div class="td-stat-card">
-        <div class="td-stat-icon">✨</div>
-        <div class="td-stat-num" id="td-avg-exp">—</div>
-        <div class="td-stat-lbl">EXP TB</div>
-      </div>
-      <div class="td-stat-card">
-        <div class="td-stat-icon">🏆</div>
-        <div class="td-stat-num" id="td-top-name">—</div>
-        <div class="td-stat-lbl">Dẫn đầu</div>
-      </div>
-    </div>
-
-    <div class="td-toolbar">
-      <input class="td-search" id="td-search" type="text" placeholder="🔍 Tìm tên học sinh..." oninput="filterLeaderboard()"/>
-      <select class="td-filter" id="td-sort" onchange="filterLeaderboard()">
-        <option value="exp">Sắp xếp: EXP cao nhất</option>
-        <option value="level">Sắp xếp: Level cao nhất</option>
-        <option value="name">Sắp xếp: Tên A-Z</option>
-        <option value="gold">Sắp xếp: Vàng nhiều nhất</option>
-        <option value="correct">Sắp xếp: Đúng nhiều nhất</option>
-      </select>
-      <button class="td-refresh-btn" onclick="loadLeaderboard()">🔄 Làm mới</button>
-    </div>
-
-    <div class="td-table-wrap">
-      <table class="td-table">
-        <thead>
-          <tr>
-            <th class="td-th-rank">#</th>
-            <th class="td-th-name">Họ và tên</th>
-            <th>Level</th>
-            <th>EXP</th>
-            <th>🪙 Vàng</th>
-            <th>✅ Đúng</th>
-            <th>❌ Sai</th>
-            <th>🎯 Tỉ lệ</th>
-            <th>🕐 Cập nhật</th>
-          </tr>
-        </thead>
-        <tbody id="td-tbody">
-          <tr><td colspan="9" class="td-loading">⏳ Đang tải dữ liệu...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+</div><!-- end login-screen -->
 
 <div id="wrap">
 <div id="game-title">⚔ VƯƠNG QUỐC TRI THỨC ⚔</div>

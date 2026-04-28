@@ -14,9 +14,26 @@
   <div class="lg-logo">⚔️</div>
   <div class="lg-title">VƯƠNG QUỐC TRI THỨC</div>
 
-  <!-- ĐĂNG NHẬP -->
-  <div id="lg-login-panel">
-    <div class="lg-sub">— ĐĂNG NHẬP ĐỂ TIẾP TỤC —</div>
+  <!-- ── PANEL CHỌN CHỨC VỤ (màn đầu tiên) ── -->
+  <div id="lg-role-panel">
+    <div class="lg-sub">— CHỌN CHỨC VỤ CỦA BẠN —</div>
+    <div class="lg-role-cards">
+      <div class="lg-role-card" onclick="selectRole('student')">
+        <div class="lg-role-icon">🧑‍🎓</div>
+        <div class="lg-role-name">Học Sinh</div>
+        <div class="lg-role-desc">Đăng nhập &amp; đăng ký<br>tài khoản học sinh</div>
+      </div>
+      <div class="lg-role-card" onclick="selectRole('teacher')">
+        <div class="lg-role-icon">👨‍🏫</div>
+        <div class="lg-role-name">Giảng Viên</div>
+        <div class="lg-role-desc">Đăng nhập &amp; đăng ký<br>tài khoản giảng viên</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ĐĂNG NHẬP (dùng chung học sinh + giảng viên) ── -->
+  <div id="lg-login-panel" style="display:none">
+    <div class="lg-sub" id="lg-login-title">— ĐĂNG NHẬP ĐỂ TIẾP TỤC —</div>
     <div class="lg-box">
       <div>
         <div class="lg-lbl">👤 Tài khoản</div>
@@ -26,15 +43,29 @@
         <div class="lg-lbl">🔒 Mật khẩu</div>
         <input class="lg-inp" id="lg-pass" type="password" placeholder="Nhập mật khẩu..."/>
       </div>
+      <div>
+        <div class="lg-lbl">🏫 Mã lớp học</div>
+        <input class="lg-inp" id="lg-class" type="text" placeholder="Nhập mã lớp học..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🎭 Chức vụ</div>
+        <select class="lg-inp lg-select" id="lg-role-select">
+          <option value="student">🧑‍🎓 Học Sinh</option>
+          <option value="teacher">👨‍🏫 Giảng Viên</option>
+        </select>
+      </div>
       <div id="lg-err">❌ Tài khoản hoặc mật khẩu không đúng!</div>
       <button class="lg-btn" id="lg-btn" onclick="doLogin()">▶ &nbsp;VÀO GAME</button>
-      <div class="lg-toggle">Chưa có tài khoản? <span onclick="showRegister()">Đăng ký ngay</span></div>
+      <div class="lg-toggle-row">
+        <span onclick="showRoleSelect()">← Quay lại</span>
+        <span onclick="showRegister()">Đăng ký tài khoản</span>
+      </div>
     </div>
   </div>
 
-  <!-- ĐĂNG KÝ -->
+  <!-- ── ĐĂNG KÝ HỌC SINH ── -->
   <div id="lg-register-panel" style="display:none">
-    <div class="lg-sub">— TẠO TÀI KHOẢN MỚI —</div>
+    <div class="lg-sub">— TẠO TÀI KHOẢN HỌC SINH —</div>
     <div class="lg-box" style="gap:10px;">
       <div>
         <div class="lg-lbl">👤 Họ và tên</div>
@@ -47,6 +78,10 @@
       <div>
         <div class="lg-lbl">📱 Số điện thoại</div>
         <input class="lg-inp" id="rg-phone" type="tel" placeholder="VD: 0912345678" autocomplete="off"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🏫 Mã lớp học</div>
+        <input class="lg-inp" id="rg-class" type="text" placeholder="Nhập mã lớp học..." autocomplete="off" spellcheck="false"/>
       </div>
       <div>
         <div class="lg-lbl">🔑 Tên tài khoản</div>
@@ -63,7 +98,48 @@
       <div id="lg-reg-err">❌ Lỗi đăng ký!</div>
       <div id="lg-reg-ok">✅ Đăng ký thành công!</div>
       <button class="lg-btn" id="rg-btn" onclick="doRegister()">📜 &nbsp;ĐĂNG KÝ</button>
-      <div class="lg-toggle">Đã có tài khoản? <span onclick="showLogin()">Đăng nhập</span></div>
+      <div class="lg-toggle-row">
+        <span onclick="showLogin()">← Quay lại đăng nhập</span>
+        <span onclick="showTeacherRegister()">Đăng ký giảng viên</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ĐĂNG KÝ GIẢNG VIÊN ── -->
+  <div id="lg-teacher-register-panel" style="display:none">
+    <div class="lg-sub">— TẠO TÀI KHOẢN GIẢNG VIÊN —</div>
+    <div class="lg-box" style="gap:10px;">
+      <div>
+        <div class="lg-lbl">👤 Họ và tên</div>
+        <input class="lg-inp" id="tr-name" type="text" placeholder="Nhập họ và tên..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">📱 Số điện thoại</div>
+        <input class="lg-inp" id="tr-phone" type="tel" placeholder="VD: 0912345678" autocomplete="off"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🏫 Mã lớp học (tạo mới)</div>
+        <input class="lg-inp" id="tr-class" type="text" placeholder="VD: TOAN10A1..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔑 Tên tài khoản</div>
+        <input class="lg-inp" id="tr-user" type="text" placeholder="Tên đăng nhập..." autocomplete="off" spellcheck="false"/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔒 Đặt mật khẩu</div>
+        <input class="lg-inp" id="tr-pass" type="password" placeholder="Nhập mật khẩu..."/>
+      </div>
+      <div>
+        <div class="lg-lbl">🔒 Xác nhận mật khẩu</div>
+        <input class="lg-inp" id="tr-pass2" type="password" placeholder="Nhập lại mật khẩu..."/>
+      </div>
+      <div id="lg-tr-err">❌ Lỗi đăng ký!</div>
+      <div id="lg-tr-ok">✅ Đăng ký thành công!</div>
+      <button class="lg-btn lg-btn-teacher" id="tr-btn" onclick="doTeacherRegister()">🎓 &nbsp;ĐĂNG KÝ GIẢNG VIÊN</button>
+      <div class="lg-toggle-row">
+        <span onclick="showLogin()">← Quay lại đăng nhập</span>
+        <span onclick="showRegister()">Đăng ký học sinh</span>
+      </div>
     </div>
   </div>
 </div>
@@ -213,14 +289,14 @@
       <div class="b-top">
         <div class="b-ent">
           <div class="b-name">HIỆP SĨ</div>
-          <div class="b-hprow">❤<div class="b-hpbg"><div class="b-hpbar" id="b-php" style="width:100%;background:linear-gradient(90deg,#2ecc40,#57ff6e);box-shadow:0 0 8px #2ecc40"></div></div><span style="font-size:13px;color:white;font-family:'Times New Roman'" id="b-php-n">100</span></div>
-          <div class="b-hprow" style="margin-top:5px">💧<div class="b-hpbg" style="background:#00001a;border-color:#336"><div class="b-hpbar" id="b-mp-fill" style="width:100%;background:linear-gradient(90deg,#2196f3,#64b5f6);box-shadow:0 0 6px #2196f3"></div></div><span style="font-size:13px;color:#64b5f6;font-family:'Times New Roman'" id="b-mp-txt">80</span></div>
-          <div id="b-armor-info" style="font-size:11px;color:#00bcd4;font-family:'Times New Roman';margin-top:3px"></div>
+          <div class="b-hprow">❤<div class="b-hpbg"><div class="b-hpbar" id="b-php" style="width:100%;background:linear-gradient(90deg,#2ecc40,#57ff6e);box-shadow:0 0 8px #2ecc40"></div></div><span style="font-size:6px;color:white;font-family:'Times New Roman'" id="b-php-n">100</span></div>
+          <div class="b-hprow" style="margin-top:3px">💧<div class="b-hpbg" style="background:#00001a;border-color:#336"><div class="b-hpbar" id="b-mp-fill" style="width:100%;background:linear-gradient(90deg,#2196f3,#64b5f6);box-shadow:0 0 6px #2196f3"></div></div><span style="font-size:6px;color:#64b5f6;font-family:'Times New Roman'" id="b-mp-txt">80</span></div>
+          <div id="b-armor-info" style="font-size:5px;color:#00bcd4;font-family:'Times New Roman';margin-top:1px"></div>
         </div>
-        <div style="font-family:'Times New Roman','IM Fell English',serif;color:var(--gold);font-size:20px;letter-spacing:4px">VS</div>
+        <div style="font-family:'Times New Roman','IM Fell English',serif;color:var(--gold);font-size:14px;letter-spacing:2px">VS</div>
         <div class="b-ent" style="text-align:right">
           <div class="b-name" id="b-mname">QUÁI VẬT</div>
-          <div class="b-hprow" style="justify-content:flex-end"><span style="font-size:13px;color:white;font-family:'Times New Roman'" id="b-mhp-n">50</span><div class="b-hpbg"><div class="b-hpbar" id="b-mhp" style="width:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);box-shadow:0 0 8px #e74c3c"></div></div>💚</div>
+          <div class="b-hprow" style="justify-content:flex-end"><span style="font-size:6px;color:white;font-family:'Times New Roman'" id="b-mhp-n">50</span><div class="b-hpbg"><div class="b-hpbar" id="b-mhp" style="width:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);box-shadow:0 0 8px #e74c3c"></div></div>💚</div>
         </div>
       </div>
       <div id="battle-quiz-overlay">
@@ -228,12 +304,12 @@
         <div class="bq-question" id="bq-question"></div>
         <div class="bq-opts" id="bq-opts"></div>
       </div>
-      <canvas id="b-canvas" width="1250" height="416"></canvas>
-      <canvas id="fx-canvas" width="1250" height="416" style="position:absolute;inset:0;pointer-events:none;image-rendering:pixelated;"></canvas>
+      <canvas id="b-canvas" width="440" height="130"></canvas>
+      <canvas id="fx-canvas" width="440" height="130" style="position:absolute;inset:0;pointer-events:none;image-rendering:pixelated;"></canvas>
       <div id="b-log"></div>
       <div class="bbtns">
         <button class="bbtn bbtn-a" onclick="doB('attack')">⚔ ĐÁNH</button>
-        <button class="bbtn bbtn-m" onclick="doB('magic')">✨ PHÉP <span id="b-mana-cost" style="font-size:11px;opacity:0.8">(-28MP)</span></button>
+        <button class="bbtn bbtn-m" onclick="doB('magic')">✨ PHÉP <span id="b-mana-cost" style="font-size:5px;opacity:0.8">(-28MP)</span></button>
         <button class="bbtn bbtn-hp" onclick="doB('hppot')" style="border-color:#e74c3c;color:#e74c3c;">🧪 BÌNH MÁU (<span id="b-hppot">0</span>)</button>
         <button class="bbtn bbtn-mp2" onclick="doB('manapot')" style="border-color:#2196f3;color:#2196f3;">💧 BÌNH MANA (<span id="b-manapot">0</span>)</button>
         <button class="bbtn bbtn-r" onclick="doB('flee')">↩ CHẠY</button>

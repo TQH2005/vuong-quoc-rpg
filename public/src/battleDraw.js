@@ -608,13 +608,13 @@ function drawBattleScene(atk,def,animType){
 
   // ── GROUND ───────────────────────────────────────────────────
   const BW=bcv.width, BH=bcv.height;
-  const groundY=BH-52;
+  const groundY=BH-22;
   const gnd=bc.createLinearGradient(0,groundY,0,BH);
   gnd.addColorStop(0,'#2d1c3a');gnd.addColorStop(1,'#160c22');
-  bc.fillStyle=gnd;bc.fillRect(0,groundY,BW,BH-groundY);
+  bc.fillStyle=gnd;bc.fillRect(0,groundY,BW,BH-groundY+10);
   bc.save();bc.globalAlpha=0.18;bc.strokeStyle='#ffffff';bc.lineWidth=0.5;
-  for(let tx=0;tx<BW;tx+=40){bc.beginPath();bc.moveTo(tx,groundY);bc.lineTo(tx,BH);bc.stroke();}
-  bc.beginPath();bc.moveTo(0,groundY+20);bc.lineTo(BW,groundY+20);bc.stroke();
+  for(let tx=0;tx<BW;tx+=40){bc.beginPath();bc.moveTo(tx,groundY);bc.lineTo(tx,BH+10);bc.stroke();}
+  bc.beginPath();bc.moveTo(0,groundY+10);bc.lineTo(BW,groundY+10);bc.stroke();
   bc.restore();
   // Bỏ thanh cỏ xanh trong battle
 
@@ -640,31 +640,12 @@ function drawBattleScene(atk,def,animType){
   else P.attackAnim=0;
   drawKnight(bc, 36+pShake, groundY-80, false, false, frameCount, !atk);
   P.attackAnim=_savedAtk; // restore
-  // Thiêu đốt: nhân vật ửng đỏ + lửa dưới chân
+  // Thiêu đốt: nhân vật ửng đỏ (không hiệu ứng lửa bay)
   if(bPlayerBurnTurns>0){
     bc.save();
     bc.globalAlpha=0.28+Math.sin(frameCount*0.18)*0.1;
     bc.fillStyle='#ff2200';
     bc.fillRect(36+pShake-2, groundY-82, 56, 86);
-    bc.restore();
-    // Lửa dưới chân nhân vật
-    bc.save();
-    const _fx=62+pShake, _fy=groundY;
-    for(let _fi=0;_fi<3;_fi++){
-      const _foff=(_fi-1)*14;
-      const _fh=22+Math.abs(Math.sin(frameCount*0.15+_fi*1.1))*16;
-      const _fg=bc.createLinearGradient(_fx+_foff,_fy,_fx+_foff,_fy-_fh);
-      _fg.addColorStop(0,'rgba(255,50,0,0.95)');
-      _fg.addColorStop(0.4,'rgba(255,140,0,0.8)');
-      _fg.addColorStop(1,'rgba(255,230,0,0)');
-      bc.fillStyle=_fg;
-      bc.beginPath();
-      const _fw=7+Math.sin(frameCount*0.2+_fi)*3;
-      bc.moveTo(_fx+_foff-_fw,_fy);
-      bc.quadraticCurveTo(_fx+_foff,_fy-_fh*0.6,_fx+_foff+_fw*0.3,_fy-_fh);
-      bc.quadraticCurveTo(_fx+_foff+_fw*0.8,_fy-_fh*0.5,_fx+_foff+_fw,_fy);
-      bc.closePath();bc.fill();
-    }
     bc.restore();
   }
   // Hurt flash: tint đỏ khi bị đánh

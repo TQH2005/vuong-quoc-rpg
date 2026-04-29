@@ -2,7 +2,7 @@ function drawBattleScene(atk,def,animType){
   const bc=bctx;
   bc.clearRect(0,0,bcv.width,bcv.height);
   // Scale toàn bộ nội dung theo kích thước canvas thực tế
-  const _scaleX=bcv.width/440, _scaleY=bcv.height/200;
+  const _scaleX=bcv.width/440, _scaleY=bcv.height/450;
   bc.save();
   bc.scale(_scaleX,_scaleY);
 

@@ -123,31 +123,35 @@ function renderBagSections(){
   const s3=document.createElement('div');s3.className='bag-section';
   s3.innerHTML='<div class="bag-section-title">🧪 Bình ('+totalPots+')</div>';
   const g3=document.createElement('div');g3.className='bag-grid';
-  // HP Potion slots
-  for(let i=0;i<Math.max(potions.hp,1);i++){
+  // HP Potion — 1 slot với số lượng
+  {
     const slot=document.createElement('div');
-    const has=i<potions.hp;
-    slot.className='bag-slot'+(has?'':' empty');
-    if(has){
+    slot.className='bag-slot'+(potions.hp>0?'':' empty');
+    if(potions.hp>0){
       slot.innerHTML=`
         <div class="bag-slot-icon">🧪</div>
         <div class="bag-slot-name">Máu</div>
         <div class="bag-slot-stat" style="color:#e74c3c">+50❤</div>
-        <div class="bag-slot-tip"><b style="color:#ffd700">🧪 Bình Máu</b><br>Hồi 50 HP<br><span style="color:#aaa">Dùng trong chiến đấu</span></div>`;
+        <div class="bag-slot-qty">×${potions.hp}</div>
+        <div class="bag-slot-tip"><b style="color:#ffd700">🧪 Bình Máu</b><br>Hồi 50 HP<br>Số lượng: ${potions.hp}<br><span style="color:#aaa">Dùng trong chiến đấu</span></div>`;
+    } else {
+      slot.innerHTML=`<div class="bag-slot-icon" style="opacity:0.3">🧪</div><div class="bag-slot-name" style="opacity:0.3">Máu</div><div class="bag-slot-stat" style="color:#555">0</div>`;
     }
     g3.appendChild(slot);
   }
-  // Mana Potion slots
-  for(let i=0;i<Math.max(potions.mana,1);i++){
+  // Mana Potion — 1 slot với số lượng
+  {
     const slot=document.createElement('div');
-    const has=i<potions.mana;
-    slot.className='bag-slot'+(has?'':' empty');
-    if(has){
+    slot.className='bag-slot'+(potions.mana>0?'':' empty');
+    if(potions.mana>0){
       slot.innerHTML=`
         <div class="bag-slot-icon">💧</div>
         <div class="bag-slot-name">Mana</div>
         <div class="bag-slot-stat" style="color:#2196f3">+40💧</div>
-        <div class="bag-slot-tip"><b style="color:#ffd700">💧 Bình Mana</b><br>Hồi 40 Mana<br><span style="color:#aaa">Dùng trong chiến đấu</span></div>`;
+        <div class="bag-slot-qty">×${potions.mana}</div>
+        <div class="bag-slot-tip"><b style="color:#ffd700">💧 Bình Mana</b><br>Hồi 40 Mana<br>Số lượng: ${potions.mana}<br><span style="color:#aaa">Dùng trong chiến đấu</span></div>`;
+    } else {
+      slot.innerHTML=`<div class="bag-slot-icon" style="opacity:0.3">💧</div><div class="bag-slot-name" style="opacity:0.3">Mana</div><div class="bag-slot-stat" style="color:#555">0</div>`;
     }
     g3.appendChild(slot);
   }

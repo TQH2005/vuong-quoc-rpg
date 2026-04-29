@@ -108,9 +108,9 @@ function _tryAdvanceOceanFloor(){
     if(undergroundFloor === 9 && !hoaLongUnlocked){
       _showBossDialog(
         '🔥 CỔNG ĐỊA NGỤC — TẦNG 10',
-        'Một cánh cổng khổng lồ bằng đá đen, họa tiết lửa bao quanh rừng rực... Hỏa Long Vương rít lên: "Trước khi vào, hãy giải mật mã này — nếu không ngươi sẽ tan thành tro!"',
-        '🔐 GIẢI MẬT MÃ',
-        () => openMinigame('cipher',
+        'Một cánh cổng khổng lồ bằng đá đen, họa tiết lửa bao quanh rừng rực... Hỏa Long Vương rít lên: "Trước khi vào, hãy giải ô số này — nếu không ngươi sẽ tan thành tro!"',
+        '🔢 GIẢI Ô SỐ SUDOKU',
+        () => openMinigame('sudoku',
           () => { // thắng
             hoaLongUnlocked = true;
             _orig(); // advance thật — vào tầng 10
@@ -171,7 +171,9 @@ function openMinigame(type, onWin, onLose){
   const hint    = document.getElementById('minigame-hint');
 
   overlay.style.background = type==='chess' ? '#06040a'
-    : type==='caro' ? '#000c1a' : '#0d0805';
+    : type==='caro' ? '#000c1a'
+    : type==='sudoku' ? '#0a0500'
+    : '#0d0805';
 
   if(type==='chess'){
     title.textContent = '♟ CỜ VUA — THÁCH ĐẤU HẮC LONG';
@@ -179,6 +181,9 @@ function openMinigame(type, onWin, onLose){
   } else if(type==='caro'){
     title.textContent = '🌊 CỜ CARO — THÁCH ĐẤU THỦY LONG';
     hint.textContent  = 'Thắng cờ caro để vào tầng 10 đại dương';
+  } else if(type==='sudoku'){
+    title.textContent = '🔥 Ô SỐ SUDOKU — MỞ CỔNG ĐỊA NGỤC';
+    hint.textContent  = 'Hoàn thành Sudoku để vào tầng 10 lòng đất';
   } else {
     title.textContent = '🔐 MẬT MÃ — MỞ CỔNG ĐỊA NGỤC';
     hint.textContent  = 'Giải đúng mật mã để vào tầng 10 lòng đất';
@@ -209,6 +214,7 @@ function _buildMinigameHTML(type){
   if(type==='chess')  return _chessHTML();
   if(type==='caro')   return _caroHTML();
   if(type==='cipher') return _cipherHTML();
+  if(type==='sudoku') return _sudokuHTML();
   return '';
 }
 
@@ -429,5 +435,5 @@ function _initMG(type){
   if(type==='chess')  _csInit();
   if(type==='caro')   _crInit();
   if(type==='cipher') _cpGen();
+  if(type==='sudoku' && typeof _initSudoku==='function') _initSudoku();
 }
-

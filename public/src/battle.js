@@ -144,9 +144,11 @@ function showBattleQuiz(attackType){
   });
 }
 function startBattle(m){
-  // Hide ocean exit button during battle
-  const _oceanExit=document.getElementById('btn-ocean-exit');
-  if(_oceanExit) _oceanExit.style.display='none';
+  // Hide ocean/underground exit buttons during battle
+  ['ocean-exit-btn','indoor-exit-btn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
   // Shadow dragon only available at night
   if(m.type==='dragon_shadow'&&!isNightTime()){
     showNotif('🌑 Ám Long chỉ xuất hiện ban đêm!'); return;
@@ -905,9 +907,11 @@ function triggerHacLongPhase2(){
 }
 
 function endBattle(won,rw){
-  // Restore ocean exit button
-  const _oceanExit=document.getElementById('btn-ocean-exit');
-  if(_oceanExit) _oceanExit.style.display='';
+  // Restore exit buttons
+  ['ocean-exit-btn','indoor-exit-btn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='';
+  });
   stopDragonFXLoop();
   bActive=false;
   FX.stop();

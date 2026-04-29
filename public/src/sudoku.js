@@ -144,7 +144,41 @@ function _sudokuHTML(){
   font-size:14px;letter-spacing:3px;color:#fff5e0;cursor:pointer;
   text-transform:uppercase;box-shadow:0 4px 16px rgba(255,80,0,0.3);
 }
-.sdk-win-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,0,0.5);}
+/* ── Fire burn effect ── */
+@keyframes sdk-fire-anim{
+  0%  {box-shadow:inset 0 0 8px rgba(255,80,0,0.6), 0 0 6px rgba(255,80,0,0.8); background:rgba(255,60,0,0.25);}
+  25% {box-shadow:inset 0 0 14px rgba(255,160,0,0.8), 0 0 12px rgba(255,120,0,0.9); background:rgba(255,100,0,0.35);}
+  50% {box-shadow:inset 0 0 20px rgba(255,200,0,0.9), 0 0 18px rgba(255,180,0,1); background:rgba(255,160,0,0.45);}
+  75% {box-shadow:inset 0 0 14px rgba(255,80,0,0.7), 0 0 10px rgba(255,60,0,0.8); background:rgba(255,80,0,0.3);}
+  100%{box-shadow:inset 0 0 8px rgba(255,40,0,0.5), 0 0 6px rgba(255,40,0,0.6); background:rgba(200,40,0,0.2);}
+}
+.sdk-cell.burning{
+  animation:sdk-fire-anim 0.3s ease-in-out infinite !important;
+  color:#ffdd88 !important;
+  cursor:default !important;
+  z-index:2;
+}
+.sdk-cell.burned{
+  background:rgba(40,20,0,0.5) !important;
+  color:transparent !important;
+}
+.sdk-cell.burning::after{
+  content:'🔥';
+  position:absolute;
+  font-size:clamp(10px,2.5vw,16px);
+  animation:sdk-ember 0.2s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes sdk-ember{
+  from{transform:scale(0.9) translateY(0);}
+  to{transform:scale(1.1) translateY(-2px);}
+}
+#sdk-fire-warn{
+  font-size:12px;color:#ff8844;text-align:center;
+  min-height:16px;letter-spacing:1px;margin-top:4px;
+  animation:sdk-warn-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes sdk-warn-pulse{from{opacity:0.6;}to{opacity:1;}}
 </style>
 <div id="sdk-wrap">
   <div id="sdk-title">🔥 Ô SỐ SUDOKU</div>
@@ -159,6 +193,7 @@ function _sudokuHTML(){
     <div id="sdk-timer">⏱ 00:00</div>
     <div id="sdk-mistakes">❌ Sai: 0/5</div>
   </div>
+  <div id="sdk-fire-warn"></div>
   <div id="sdk-board"></div>
   <div id="sdk-numpad"></div>
   <div id="sdk-actions">
@@ -180,7 +215,12 @@ let _sdkSel=null, _sdkMistakes=0, _sdkDiff=1;
 let _sdkTimerEl=null, _sdkTimerSec=0, _sdkTimerInt=null;
 let _sdkHints=3, _sdkOver=false;
 
-const _SDK_DIFF_HOLES=[38,46,52];
+// Fire burn system
+let _sdkFireInt=null;        // interval kiểm tra đốt ô
+let _sdkBurning=new Set();   // set 'r,c' đang cháy (animation)
+let _sdkBurned=new Set();    // set 'r,c' đã bị xóa (cần điền lại)
+const _SDK_FIRE_PROB=[0,0.20,0.25,0.30]; // xác suất theo độ khó
+const _SDK_FIRE_INTERVAL=8000;           // kiểm tra mỗi 8 giây
 
 function _sdkSetDiff(d){
   _sdkDiff=d;
@@ -200,8 +240,11 @@ function _sdkNewGame(){
   _sdkMistakes=0;
   _sdkHints=3;
   _sdkOver=false;
-  // Reset timer
+  _sdkBurning=new Set();
+  _sdkBurned=new Set();
+  // Reset timer + fire
   clearInterval(_sdkTimerInt);
+  clearInterval(_sdkFireInt);
   _sdkTimerSec=0;
   _sdkTimerInt=setInterval(()=>{
     if(_sdkOver) return;
@@ -211,9 +254,16 @@ function _sdkNewGame(){
     const el=document.getElementById('sdk-timer');
     if(el) el.textContent=`⏱ ${m}:${s}`;
   },1000);
+  // Bắt đầu fire sau 15 giây
+  setTimeout(()=>{
+    if(_sdkOver) return;
+    _sdkFireInt=setInterval(_sdkFireTick, _SDK_FIRE_INTERVAL);
+  }, 15000);
   _sdkRender();
   const msg=document.getElementById('sdk-msg');
   if(msg) msg.textContent='';
+  const warn=document.getElementById('sdk-fire-warn');
+  if(warn) warn.textContent='🔥 Cẩn thận! Hỏa Long có thể đốt cháy ô số bất kỳ lúc nào...';
   const win=document.getElementById('sdk-win');
   if(win) win.style.display='none';
   _sdkUpdateInfo();
@@ -228,9 +278,20 @@ function _sdkRender(){
       const cell=document.createElement('div');
       cell.className='sdk-cell';
       cell.dataset.r=r; cell.dataset.c=c;
+      const key=`${r},${c}`;
       const given=_sdkPuzzle[r][c]!==0;
       const val=_sdkUser[r][c];
-      if(given){
+      const isBurning=_sdkBurning.has(key);
+      const isBurned=_sdkBurned.has(key);
+
+      if(isBurning){
+        // Đang cháy — hiện số nhưng có animation lửa
+        cell.classList.add('burning');
+        cell.textContent=val||'';
+      } else if(isBurned){
+        // Đã bị đốt — ô trống, nền tối
+        cell.classList.add('burned');
+      } else if(given){
         cell.classList.add('given');
         cell.textContent=val;
       } else if(val!==0){
@@ -238,15 +299,15 @@ function _sdkRender(){
         cell.classList.add(val!==_sdkSolution[r][c]?'error':'user');
       }
       // Selected
-      if(_sdkSel&&_sdkSel[0]===r&&_sdkSel[1]===c) cell.classList.add('selected');
-      // Highlight same row/col/box
-      else if(_sdkSel){
-        const [sr,sc]=_sdkSel;
-        const sameBox=Math.floor(r/3)===Math.floor(sr/3)&&Math.floor(c/3)===Math.floor(sc/3);
-        if(r===sr||c===sc||sameBox) cell.classList.add('highlight');
-        // Same number
-        const selVal=_sdkUser[sr][sc];
-        if(selVal!==0&&val===selVal) cell.classList.add('same-num');
+      if(!isBurning&&!isBurned){
+        if(_sdkSel&&_sdkSel[0]===r&&_sdkSel[1]===c) cell.classList.add('selected');
+        else if(_sdkSel){
+          const [sr,sc]=_sdkSel;
+          const sameBox=Math.floor(r/3)===Math.floor(sr/3)&&Math.floor(c/3)===Math.floor(sc/3);
+          if(r===sr||c===sc||sameBox) cell.classList.add('highlight');
+          const selVal=_sdkUser[sr][sc];
+          if(selVal!==0&&val===selVal) cell.classList.add('same-num');
+        }
       }
       cell.onclick=()=>_sdkSelect(r,c);
       board.appendChild(cell);
@@ -266,7 +327,51 @@ function _sdkRender(){
   }
 }
 
+// ── Fire burn tick ─────────────────────────
+function _sdkFireTick(){
+  if(_sdkOver) return;
+  const prob=_SDK_FIRE_PROB[_sdkDiff];
+  if(Math.random()>prob) return; // không đốt lần này
+
+  // Tìm ô hợp lệ để đốt: không phải given, đang có giá trị đúng, chưa bị đốt/cháy
+  const candidates=[];
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    const key=`${r},${c}`;
+    if(_sdkPuzzle[r][c]!==0) continue;          // given → skip
+    if(_sdkBurning.has(key)||_sdkBurned.has(key)) continue; // đang cháy/đã cháy → skip
+    if(_sdkUser[r][c]!==_sdkSolution[r][c]) continue;       // chưa điền đúng → skip
+    candidates.push([r,c]);
+  }
+  if(!candidates.length) return; // không có ô nào để đốt
+
+  const [r,c]=candidates[Math.floor(Math.random()*candidates.length)];
+  const key=`${r},${c}`;
+
+  // Cảnh báo
+  const warn=document.getElementById('sdk-fire-warn');
+  if(warn) warn.textContent='🔥 HỎA LONG ĐANG ĐỐT MỘT Ô SỐ!';
+
+  // Phase 1: animation cháy (1.5 giây)
+  _sdkBurning.add(key);
+  _sdkRender();
+
+  setTimeout(()=>{
+    // Phase 2: ô bị xóa
+    _sdkBurning.delete(key);
+    _sdkBurned.add(key);
+    _sdkUser[r][c]=0; // xóa giá trị
+    _sdkRender();
+    if(warn) warn.textContent='🔥 Ô số đã bị đốt! Hãy điền lại...';
+    setTimeout(()=>{
+      if(warn&&warn.textContent.includes('điền lại'))
+        warn.textContent='🔥 Cẩn thận! Hỏa Long có thể đốt cháy ô số bất kỳ lúc nào...';
+    },3000);
+  }, 1500);
+}
+
 function _sdkSelect(r,c){
+  const key=`${r},${c}`;
+  if(_sdkBurning.has(key)) return; // đang cháy → không chọn được
   _sdkSel=[r,c];
   _sdkRender();
 }
@@ -274,10 +379,21 @@ function _sdkSelect(r,c){
 function _sdkInput(num){
   if(_sdkOver||!_sdkSel) return;
   const [r,c]=_sdkSel;
-  if(_sdkPuzzle[r][c]!==0) return; // given cell
-  if(_sdkUser[r][c]===num){ _sdkUser[r][c]=0; _sdkRender(); return; } // toggle off
+  const key=`${r},${c}`;
+  if(_sdkBurning.has(key)) return;            // đang cháy → không điền
+  if(_sdkPuzzle[r][c]!==0) return;            // given cell
+  if(_sdkUser[r][c]===num&&!_sdkBurned.has(key)){ _sdkUser[r][c]=0; _sdkRender(); return; }
   _sdkUser[r][c]=num;
-  if(num!==_sdkSolution[r][c]){
+  if(num===_sdkSolution[r][c]){
+    // Điền đúng — nếu ô bị đốt thì phục hồi
+    if(_sdkBurned.has(key)){
+      _sdkBurned.delete(key);
+      const warn=document.getElementById('sdk-fire-warn');
+      if(warn) warn.textContent='✅ Đã điền lại ô bị đốt! Giỏi lắm!';
+    }
+    const msg=document.getElementById('sdk-msg');
+    if(msg) msg.textContent='';
+  } else {
     _sdkMistakes++;
     _sdkUpdateInfo();
     const msg=document.getElementById('sdk-msg');
@@ -285,16 +401,19 @@ function _sdkInput(num){
     if(_sdkMistakes>=5){
       _sdkOver=true;
       clearInterval(_sdkTimerInt);
+      clearInterval(_sdkFireInt);
       if(msg) msg.textContent='💀 Quá 5 lỗi! Ván mới sẽ bắt đầu...';
       setTimeout(()=>_sdkNewGame(),2000);
+      return;
     }
-  } else {
-    const msg=document.getElementById('sdk-msg');
-    if(msg) msg.textContent='';
   }
   _sdkRender();
-  // Check complete
-  if(_sdkUser.every((row,r)=>row.every((v,c)=>v===_sdkSolution[r][c]))){
+  if(_sdkUser.every((row,r)=>row.every((v,c)=>{
+    const k=`${r},${c}`;
+    // Ô burned chưa điền lại → chưa xong
+    if(_sdkBurned.has(k)&&v===0) return false;
+    return v===_sdkSolution[r][c];
+  }))){
     _sdkComplete();
   }
 }
@@ -334,6 +453,7 @@ function _sdkUpdateInfo(){
 function _sdkComplete(){
   _sdkOver=true;
   clearInterval(_sdkTimerInt);
+  clearInterval(_sdkFireInt);
   const m=String(Math.floor(_sdkTimerSec/60)).padStart(2,'0');
   const s=String(_sdkTimerSec%60).padStart(2,'0');
   const win=document.getElementById('sdk-win');
@@ -342,10 +462,13 @@ function _sdkComplete(){
   if(win) win.style.display='block';
   const msg=document.getElementById('sdk-msg');
   if(msg) msg.textContent='';
+  const warn=document.getElementById('sdk-fire-warn');
+  if(warn) warn.textContent='🏆 Hoàn thành! Hỏa Long bại trận!';
 }
 
 function _sdkOnWin(){
   clearInterval(_sdkTimerInt);
+  clearInterval(_sdkFireInt);
   closeMinigame(true);
 }
 

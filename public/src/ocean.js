@@ -10,6 +10,7 @@ function startOceanBattle(floorData){
     ...floorData.monster,
     wx:0,wy:0,w:44,h:72,
     alive:true,dir:-1,mt:0,
+    type: floorData.monster.type || floorData.drawFn && floorData.drawFn.replace('draw','').toLowerCase() || 'shark',
   };
   // Dùng hệ thống battle hiện có
   startBattle(mon);
@@ -496,4 +497,3 @@ function updatePhysics(){
 
   updateParticles();
 }
-

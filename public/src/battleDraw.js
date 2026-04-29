@@ -1,10 +1,6 @@
 function drawBattleScene(atk,def,animType){
   const bc=bctx;
   bc.clearRect(0,0,bcv.width,bcv.height);
-  // Scale toàn bộ nội dung theo kích thước canvas thực tế
-  const _scaleX=bcv.width/440, _scaleY=bcv.height/200;
-  bc.save();
-  bc.scale(_scaleX,_scaleY);
 
   // Night battle: shift background to blood red/purple
   const night=isNightTime();
@@ -97,74 +93,55 @@ function drawBattleScene(atk,def,animType){
     bc.restore();
 
   } else if(undergroundActive && bMon){
-    // ── LÒNG ĐẤT — hang đá đỏ ───────────────────────────────
+    // ── LÒNG ĐẤT — hang động nâu, nhũ đá ────────────────────
     const BW=bcv.width, BH=bcv.height;
-    const _floor=(typeof undergroundFloor!=='undefined'?undergroundFloor:1);
-    // Nền hang đá đỏ tối
+    const depth=(typeof undergroundFloor!=='undefined'?undergroundFloor:5)/10;
     const caveBg=bc.createLinearGradient(0,0,0,BH);
-    caveBg.addColorStop(0,'#1a0400');caveBg.addColorStop(0.5,'#2a0800');caveBg.addColorStop(1,'#1a0300');
+    caveBg.addColorStop(0,`hsl(22,${18-depth*8}%,${9-depth*4}%)`);
+    caveBg.addColorStop(1,`hsl(12,${12-depth*5}%,${5-depth*3}%)`);
     bc.fillStyle=caveBg;bc.fillRect(0,0,BW,BH);
-    // Vết nứt tường đỏ
+    // Vết nứt tường
     bc.save();
-    for(let cr=0;cr<7;cr++){
-      const glow=0.12+Math.sin(frameCount*0.04+cr)*0.06;
-      bc.strokeStyle=`rgba(180,40,0,${glow})`;bc.lineWidth=1;
-      bc.beginPath();bc.moveTo(cr*70+15,0);
-      let cy2=0;while(cy2<BH){cy2+=16;bc.lineTo(cr*70+15+Math.sin(cr+cy2)*5,cy2);}
+    for(let cr=0;cr<6;cr++){
+      bc.strokeStyle=`rgba(80,40,10,${0.18+cr*0.02})`;bc.lineWidth=1;
+      bc.beginPath();bc.moveTo(cr*80+20,0);
+      let cy2=0;while(cy2<BH){cy2+=18;bc.lineTo(cr*80+20+Math.sin(cr+cy2)*4,cy2);}
       bc.stroke();
     }
     bc.restore();
-    // Nhũ đá đỏ trên trần
-    bc.fillStyle='#1c0400';
-    for(let s=0;s<16;s++){
-      const sx=s*28+6+Math.sin(s*2.1)*6;
-      const sh=14+Math.sin(s*1.9)*12;
-      bc.beginPath();bc.moveTo(sx,0);bc.lineTo(sx+12,0);bc.lineTo(sx+6,sh);bc.closePath();bc.fill();
-      bc.save();bc.globalAlpha=0.2;bc.fillStyle='#8b1000';
-      bc.beginPath();bc.moveTo(sx+2,0);bc.lineTo(sx+5,0);bc.lineTo(sx+6,sh*0.55);bc.closePath();bc.fill();bc.restore();
+    // Nhũ đá trên trần
+    bc.fillStyle='#1e1208';
+    for(let s=0;s<14;s++){
+      const sx=s*32+8+Math.sin(s*2.3)*8;
+      const sh=16+Math.sin(s*1.7)*14;
+      bc.beginPath();bc.moveTo(sx,0);bc.lineTo(sx+14,0);bc.lineTo(sx+7,sh);bc.closePath();bc.fill();
+      // Highlight nhũ đá
+      bc.save();bc.globalAlpha=0.18;bc.fillStyle='#7a5030';
+      bc.beginPath();bc.moveTo(sx+2,0);bc.lineTo(sx+6,0);bc.lineTo(sx+7,sh*0.6);bc.closePath();bc.fill();bc.restore();
     }
-    // Sàn đất đá đỏ
+    // Nền đất nâu
     const groundY_c=Math.round(BH*0.76);
     const dirtC=bc.createLinearGradient(0,groundY_c,0,BH);
-    dirtC.addColorStop(0,'#4a0a00');dirtC.addColorStop(0.5,'#2e0500');dirtC.addColorStop(1,'#1a0200');
+    dirtC.addColorStop(0,'#3a2010');dirtC.addColorStop(1,'#1e0e06');
     bc.fillStyle=dirtC;bc.fillRect(0,groundY_c,BW,BH-groundY_c);
-    // Viền sàn đỏ
-    bc.fillStyle='#6a1000';bc.fillRect(0,groundY_c,BW,3);
-    // Vết nứt nham thạch
-    bc.save();
-    for(let lc=0;lc<8;lc++){
-      const lcx=lc*55+15;const glow=0.35+Math.sin(frameCount*0.07+lc)*0.2;
-      bc.strokeStyle=`rgba(255,60,0,${glow})`;bc.lineWidth=1.5;
-      bc.shadowColor='#ff2200';bc.shadowBlur=4;
-      bc.beginPath();bc.moveTo(lcx,groundY_c);bc.bezierCurveTo(lcx+12,groundY_c+5,lcx+28,groundY_c+2,lcx+42,groundY_c+7);bc.stroke();
+    bc.fillStyle='#4a2a12';bc.fillRect(0,groundY_c,BW,4);
+    // Măng đá từ sàn
+    bc.fillStyle='#2e1a0a';
+    for(let s=0;s<6;s++){
+      const sx=s*68+30+Math.sin(s*1.9)*15;const sh=10+Math.sin(s*1.3)*8;
+      bc.beginPath();bc.moveTo(sx,groundY_c);bc.lineTo(sx+10,groundY_c);bc.lineTo(sx+5,groundY_c-sh);bc.closePath();bc.fill();
     }
-    bc.shadowBlur=0;bc.restore();
-    // Ánh nham thạch bập bùng
-    bc.save();
-    for(let l=0;l<5;l++){
-      const lx=35+l*90,lp=0.28+Math.sin(frameCount*0.08+l)*0.16;
-      const lg=bc.createRadialGradient(lx,groundY_c,1,lx,groundY_c,26);
-      lg.addColorStop(0,`rgba(255,80,0,${lp})`);lg.addColorStop(1,'transparent');
-      bc.fillStyle=lg;bc.beginPath();bc.ellipse(lx,groundY_c,26,6,0,0,Math.PI*2);bc.fill();
-    }
-    bc.restore();
-    // Măng đá đỏ từ sàn
-    bc.fillStyle='#3a0800';
-    for(let s=0;s<7;s++){
-      const sx=s*60+25+Math.sin(s*1.9)*12;const sh=8+Math.sin(s*1.4)*6;
-      bc.beginPath();bc.moveTo(sx,groundY_c);bc.lineTo(sx+9,groundY_c);bc.lineTo(sx+4,groundY_c-sh);bc.closePath();bc.fill();
-    }
-    // Đuốc đỏ
+    // Đuốc
     bc.save();
     for(let t=0;t<3;t++){
       const tx=80+t*160,ty=Math.round(BH*0.22);
       const flicker=0.5+Math.sin(frameCount*0.13+t*1.5)*0.35;
       const tg=bc.createRadialGradient(tx,ty,2,tx,ty,34);
-      tg.addColorStop(0,`rgba(255,80,0,${flicker})`);tg.addColorStop(1,'transparent');
+      tg.addColorStop(0,`rgba(255,160,40,${flicker})`);tg.addColorStop(1,'transparent');
       bc.fillStyle=tg;bc.beginPath();bc.arc(tx,ty,34,0,Math.PI*2);bc.fill();
-      bc.fillStyle='#5a1000';bc.fillRect(tx-3,ty+3,6,12);
-      bc.fillStyle='#ff4400';bc.beginPath();bc.arc(tx,ty,4+flicker*2,0,Math.PI*2);bc.fill();
-      bc.fillStyle='#ffaa44';bc.beginPath();bc.arc(tx,ty-3,2.5,0,Math.PI*2);bc.fill();
+      bc.fillStyle='#8b4513';bc.fillRect(tx-3,ty+3,6,12);
+      bc.fillStyle='#ff8800';bc.beginPath();bc.arc(tx,ty,4+flicker*2,0,Math.PI*2);bc.fill();
+      bc.fillStyle='#ffee66';bc.beginPath();bc.arc(tx,ty-3,2.5,0,Math.PI*2);bc.fill();
     }
     bc.restore();
 
@@ -625,29 +602,58 @@ function drawBattleScene(atk,def,animType){
     bc.restore();
   }
 
-  // ── GROUND — đất cỏ ────────────────────────────────────────
+  // ── GROUND ───────────────────────────────────────────────────
   const BW=bcv.width, BH=bcv.height;
-  const groundY=BH-22;
-  // Đất nâu
-  const gnd=bc.createLinearGradient(0,groundY,0,BH);
-  gnd.addColorStop(0,'#5c3a1e');gnd.addColorStop(0.4,'#3d2410');gnd.addColorStop(1,'#2a1808');
-  bc.fillStyle=gnd;bc.fillRect(0,groundY,BW,BH-groundY+10);
-  // Lớp cỏ xanh
-  bc.fillStyle='#2d7a1e';bc.fillRect(0,groundY,BW,6);
-  bc.fillStyle='#3a9828';bc.fillRect(0,groundY,BW,3);
-  bc.fillStyle='#4ab830';bc.fillRect(0,groundY,BW,1);
-  // Cỏ lá nhỏ
-  bc.save();
-  for(let gx=2;gx<BW;gx+=6){
-    const gh=4+Math.sin(gx*0.5+frameCount*0.02)*2;
-    bc.fillStyle=gx%12===0?'#5acc3a':'#3aaa28';
-    bc.fillRect(gx,groundY-gh,2,gh);
+  const groundY=BH-52;
+  const _isUndergroundBattle = (undergroundActive && bMon) || isFireDragonBattle;
+  if(_isUndergroundBattle){
+    // ── Đất đỏ hang động ────────────────────────────────────
+    const gnd=bc.createLinearGradient(0,groundY,0,BH);
+    gnd.addColorStop(0,'#5a0e00');gnd.addColorStop(0.3,'#3a0800');gnd.addColorStop(1,'#1e0300');
+    bc.fillStyle=gnd;bc.fillRect(0,groundY,BW,BH-groundY);
+    // Viền đỏ sáng trên mặt đất
+    bc.fillStyle='#7a1200';bc.fillRect(0,groundY,BW,3);
+    bc.fillStyle='#a01800';bc.fillRect(0,groundY,BW,1);
+    // Vết nứt nham thạch phát sáng
+    bc.save();
+    for(let lc=0;lc<9;lc++){
+      const lcx=lc*50+15;
+      const glow=0.4+Math.sin(frameCount*0.07+lc*0.9)*0.28;
+      bc.strokeStyle=`rgba(255,70,0,${glow})`;bc.lineWidth=1.5;
+      bc.shadowColor='#ff2200';bc.shadowBlur=5;
+      bc.beginPath();bc.moveTo(lcx,groundY);
+      bc.bezierCurveTo(lcx+10,groundY+4,lcx+28,groundY+2,lcx+42,groundY+6);
+      bc.stroke();
+    }
+    bc.shadowBlur=0;
+    // Đá dăm đỏ sẫm
+    for(let p=0;p<18;p++){
+      const px2=(p*137+11)%BW, py2=groundY+5+(p*43)%18, rs=1+p%3;
+      bc.fillStyle='rgba(120,20,0,0.5)';bc.globalAlpha=1;
+      bc.beginPath();bc.ellipse(px2,py2,rs,rs*0.6,0,0,Math.PI*2);bc.fill();
+    }
+    // Ánh lửa nhỏ bập bùng dọc mặt đất
+    for(let l=0;l<6;l++){
+      const lx=30+l*72, lp=0.22+Math.sin(frameCount*0.09+l)*0.14;
+      const lg=bc.createRadialGradient(lx,groundY,0,lx,groundY,20);
+      lg.addColorStop(0,`rgba(255,80,0,${lp})`);lg.addColorStop(1,'transparent');
+      bc.fillStyle=lg;bc.beginPath();bc.ellipse(lx,groundY,20,5,0,0,Math.PI*2);bc.fill();
+    }
+    bc.restore();
+    // Vân ngang đất
+    bc.save();bc.globalAlpha=0.12;bc.strokeStyle='#ff3300';bc.lineWidth=0.5;
+    for(let tx=0;tx<BW;tx+=38){bc.beginPath();bc.moveTo(tx,groundY+4);bc.lineTo(tx+22,groundY+8);bc.stroke();}
+    bc.restore();
+  } else {
+    // ── Đất mặc định (tím/tối) ──────────────────────────────
+    const gnd=bc.createLinearGradient(0,groundY,0,BH);
+    gnd.addColorStop(0,'#2d1c3a');gnd.addColorStop(1,'#160c22');
+    bc.fillStyle=gnd;bc.fillRect(0,groundY,BW,BH-groundY);
+    bc.save();bc.globalAlpha=0.18;bc.strokeStyle='#ffffff';bc.lineWidth=0.5;
+    for(let tx=0;tx<BW;tx+=40){bc.beginPath();bc.moveTo(tx,groundY);bc.lineTo(tx,BH);bc.stroke();}
+    bc.beginPath();bc.moveTo(0,groundY+20);bc.lineTo(BW,groundY+20);bc.stroke();
+    bc.restore();
   }
-  bc.restore();
-  // Vân đất
-  bc.save();bc.globalAlpha=0.1;bc.strokeStyle='#7a5030';bc.lineWidth=0.5;
-  for(let tx=0;tx<BW;tx+=36){bc.beginPath();bc.moveTo(tx,groundY+7);bc.lineTo(tx+20,groundY+10);bc.stroke();}
-  bc.restore();
 
   // ── AMBIENT GLOW ─────────────────────────────────────────────
   bc.save();bc.globalAlpha=0.10+Math.sin(frameCount*0.07)*0.04;
@@ -992,7 +998,6 @@ function drawBattleScene(atk,def,animType){
   bc.fillText('VS',BW/2,groundY-46);
   bc.restore();
 
-  bc.restore();
 }
 function updateBHUD(){
   document.getElementById('b-php').style.width=(bPHP/bMaxPHP*100)+'%';

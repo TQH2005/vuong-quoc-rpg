@@ -202,7 +202,7 @@ function initVirtualControls(){
   // ── BAG ──────────────────────────────────────────────────────
   wireBtn('btn-bag', ()=>{
     haptic(15);
-    if(gameState==='WORLD'||gameState==='INDOOR') openBag();
+    if(gameState==='WORLD'||gameState==='INDOOR'||gameState==='OCEAN'||gameState==='UNDERGROUND') openBag();
     else if(gameState==='BAG') closeBag();
   });
 
@@ -263,4 +263,3 @@ function syncVControls(){
 initVirtualControls();
 // Final resize after controls are set up
 setTimeout(resizeCanvas, 100);
-

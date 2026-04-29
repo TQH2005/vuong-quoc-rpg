@@ -795,18 +795,18 @@ function drawBattleScene(atk,def,animType){
       if(mspr==='goblin')      drawGoblin(bc,MCX-16+mShake,MGY-56,false,mframe);
       else if(mspr==='bat')    drawBat(bc,MCX-20+mShake,MGY-28,mframe);
       else if(mspr==='orc')    drawOrc(bc,MCX-22+mShake,MGY-78,false,mframe);
-      else if(mspr==='sea_crab')    drawSeaCrab(bc,MCX-36+mShake,MGY-60,mframe,1.5);
+      else if(mspr==='sea_crab'||mspr==='seacrab') drawSeaCrab(bc,MCX-8+mShake,MGY-30,mframe,1.5);
       else if(mspr==='hermit_crab') drawHermitCrab(bc,MCX-26+mShake,MGY-66,mframe,1);
-      else if(mspr==='big_crab')    drawBigCrab(bc,MCX-44+mShake,MGY-68,mframe,2.0);
+      else if(mspr==='big_crab'||mspr==='bigcrab') drawBigCrab(bc,MCX-8+mShake,MGY-30,mframe,2.0);
       else if(mspr==='hermit_boss') drawHermitBoss(bc,MCX-26+mShake,MGY-66,mframe,1);
-      else if(mspr==='octopus')     drawOctopus(bc,MCX-28+mShake,MGY-100,mframe,2.8);
-      else if(mspr==='squid')       drawSquid(bc,MCX-24+mShake,MGY-108,mframe,2.6);
+      else if(mspr==='octopus')     drawOctopus(bc,MCX+mShake,MGY-64,mframe,3.5);
+      else if(mspr==='squid'){const _sqSc=(bMon&&bMon.isBoss)?2.8:2.0;drawSquid(bc,MCX+mShake,MGY-Math.round(35*_sqSc),mframe,_sqSc);}
       else if(mspr==='shark'){
         bc.save(); const _ssc=2.2;
         drawShark(bc,MCX+mShake,MGY-Math.round(10*_ssc),mframe,_ssc);
         bc.restore();
       }
-      else if(mspr==='tropical')    drawTropicalFish(bc,MCX-30+mShake,MGY-48,mframe,1.4);
+      else if(mspr==='tropical'){bc.save();bc.translate(MCX+mShake,0);bc.scale(-1,1);bc.translate(-(MCX+mShake),0);drawTropicalFish(bc,MCX-22+mShake,MGY-35,mframe,1.8);bc.restore();}
       else if(mspr==='dragon'){
         bc.save();
         if(bHacPhase2){
@@ -890,18 +890,18 @@ function drawBattleScene(atk,def,animType){
       if(mspr==='goblin')      drawGoblin(bc,MCX-16+mShake,MGY-56,false,mframe);
       else if(mspr==='bat')    drawBat(bc,MCX-20+mShake,MGY-28,mframe);
       else if(mspr==='orc')    drawOrc(bc,MCX-22+mShake,MGY-78,false,mframe);
-      else if(mspr==='sea_crab')    drawSeaCrab(bc,MCX-36+mShake,MGY-60,mframe,1.5);
+      else if(mspr==='sea_crab'||mspr==='seacrab') drawSeaCrab(bc,MCX-8+mShake,MGY-30,mframe,1.5);
       else if(mspr==='hermit_crab') drawHermitCrab(bc,MCX-26+mShake,MGY-66,mframe,1);
-      else if(mspr==='big_crab')    drawBigCrab(bc,MCX-44+mShake,MGY-68,mframe,2.0);
+      else if(mspr==='big_crab'||mspr==='bigcrab') drawBigCrab(bc,MCX-8+mShake,MGY-30,mframe,2.0);
       else if(mspr==='hermit_boss') drawHermitBoss(bc,MCX-26+mShake,MGY-66,mframe,1);
-      else if(mspr==='octopus')     drawOctopus(bc,MCX-28+mShake,MGY-100,mframe,2.8);
-      else if(mspr==='squid')       drawSquid(bc,MCX-24+mShake,MGY-108,mframe,2.6);
+      else if(mspr==='octopus')     drawOctopus(bc,MCX+mShake,MGY-64,mframe,3.5);
+      else if(mspr==='squid'){const _sqSc=(bMon&&bMon.isBoss)?2.8:2.0;drawSquid(bc,MCX+mShake,MGY-Math.round(35*_sqSc),mframe,_sqSc);}
       else if(mspr==='shark'){
         bc.save(); const _ssc=2.2;
         drawShark(bc,MCX+mShake,MGY-Math.round(10*_ssc),mframe,_ssc);
         bc.restore();
       }
-      else if(mspr==='tropical')    drawTropicalFish(bc,MCX-30+mShake,MGY-48,mframe,1.4);
+      else if(mspr==='tropical'){bc.save();bc.translate(MCX+mShake,0);bc.scale(-1,1);bc.translate(-(MCX+mShake),0);drawTropicalFish(bc,MCX-22+mShake,MGY-35,mframe,1.8);bc.restore();}
       else if(mspr==='dragon'){
         bc.save();
         if(bHacPhase2){

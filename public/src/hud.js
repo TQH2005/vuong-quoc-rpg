@@ -70,7 +70,7 @@ window.addEventListener('keydown',e=>{
     }
   }
   if((e.key==='b'||e.key==='B')&&(gameState==='WORLD'||gameState==='INDOOR'))openShop();
-  if((e.key==='i'||e.key==='I')&&(gameState==='WORLD'||gameState==='INDOOR'))openBag();
+  if((e.key==='i'||e.key==='I')&&(gameState==='WORLD'||gameState==='INDOOR'||gameState==='OCEAN'||gameState==='UNDERGROUND'))openBag();
   if((e.key==='i'||e.key==='I')&&gameState==='BAG')closeBag();
   if((e.key==='t'||e.key==='T')&&!_cheatOpen&&gameState!=='BATTLE'&&gameState!=='PUZZLE'){
     // Chỉ mở console khi đã đăng nhập (login-screen đã ẩn)
@@ -284,4 +284,3 @@ const caveProgress = [
   Array.from({length:10},()=>({stars:0,done:false})),
   Array.from({length:10},()=>({stars:0,done:false})),
 ];
-

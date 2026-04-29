@@ -466,7 +466,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 .crp-box{
   background:linear-gradient(135deg,rgba(5,2,18,0.99),rgba(20,10,40,0.99));
   border:2px solid #ffd700;border-radius:8px;padding:28px 32px;
-  text-align:center;max-width:340px;width:90%;
+  text-align:center;max-width:1200px;width:90%;
   box-shadow:0 0 40px rgba(255,215,0,0.4), inset 0 0 30px rgba(0,0,0,0.5);
   animation:crpIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
 }
@@ -816,7 +816,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 
 /* TRUE/FALSE */
 .tf-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0;}
-.tf-stmt{font-family:'Times New Roman',serif;font-size:14px;color:#fff;text-align:center;padding:12px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border:1px solid rgba(255,215,0,0.2);line-height:1.5;max-width:340px;}
+.tf-stmt{font-family:'Times New Roman',serif;font-size:14px;color:#fff;text-align:center;padding:12px 16px;background:rgba(255,255,255,0.06);border-radius:8px;border:1px solid rgba(255,215,0,0.2);line-height:1.5;max-width:1200px;}
 .tf-btns{display:flex;gap:16px;}
 .tf-btn{width:110px;height:48px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Times New Roman',serif;cursor:pointer;border:2px solid;transition:transform .1s;}
 .tf-btn.true{background:rgba(46,204,64,0.15);border-color:#2ecc40;color:#2ecc40;}
@@ -856,17 +856,17 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 #shop-close:hover{box-shadow:0 0 15px rgba(231,76,60,0.4);transform:translateY(-2px);}
 
 /* BATTLE styles (position handled above) */
-.b-wrap{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:8px;}
-.b-top{display:flex;justify-content:space-between;width:100%;align-items:center;}
+.b-wrap{width:100%;max-width:1200px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.b-top{display:flex;justify-content:space-between;width:100%;max-width:1200px;align-items:center;}
 .b-ent{text-align:center;}
 .b-name{font-family:'Times New Roman','IM Fell English SC',serif;font-size:11px;color:var(--gold);margin-bottom:4px;text-shadow:0 0 8px rgba(255,215,0,0.5);}
 .b-hprow{display:flex;align-items:center;gap:4px;}
 .b-hpbg{width:80px;height:8px;background:#1a0000;border:1px solid #600;border-radius:4px;overflow:hidden;}
 .b-hpbar{height:100%;border-radius:4px;transition:width .4s;}
-#b-canvas{border:2px solid #8B6914;box-shadow:inset 0 0 30px rgba(0,0,0,0.9),0 0 20px rgba(255,0,0,0.2);display:block;}
+#b-canvas{border:2px solid #8B6914;box-shadow:inset 0 0 30px rgba(0,0,0,0.9),0 0 20px rgba(255,0,0,0.2);display:block;width:1200px;height:416px;}
 #fx-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated;}
 #b-log{
-  width:100%;max-width:340px;
+  width:100%;max-width:1200px;
   background:linear-gradient(135deg,rgba(0,0,0,0.8),rgba(10,0,20,0.9));
   border:2px solid #333;
   padding:6px 8px;height:44px;overflow-y:auto;
@@ -997,7 +997,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 #ls-icon{font-size:40px;margin-bottom:8px;animation:lsBounce .6s ease infinite alternate;}
 @keyframes lsBounce{from{transform:scale(1)}to{transform:scale(1.15)}}
 #ls-title{font-family:'Times New Roman','IM Fell English',serif;color:#ffd700;font-size:10px;letter-spacing:3px;margin-bottom:4px;}
-#ls-desc{font-size:10px;color:#ccc;margin-bottom:4px;text-align:center;max-width:340px;line-height:1.5;}
+#ls-desc{font-size:10px;color:#ccc;margin-bottom:4px;text-align:center;max-width:1200px;line-height:1.5;}
 #ls-qs{font-family:'Times New Roman','IM Fell English SC',serif;font-size:10px;color:#aaa;margin-bottom:12px;}
 .ls-btns{display:flex;gap:8px;}
 .ls-go{padding:8px 22px;border:2px solid #ffd700;color:#ffd700;background:rgba(80,60,0,0.4);font-family:'Times New Roman','IM Fell English SC',serif;font-size:10px;cursor:pointer;transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
@@ -1251,7 +1251,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 
   /* ── Battle ── */
   .b-wrap{gap:6px;}
-  #b-canvas{width:100%;max-width:440px;}
+  #b-canvas{width:100%;max-width:100%;}
   .bbtns{flex-wrap:wrap;gap:5px;justify-content:center;}
   .bbtn{padding:10px 10px;font-size:10px;min-height:42px;}
   .b-name{font-size:10px;}

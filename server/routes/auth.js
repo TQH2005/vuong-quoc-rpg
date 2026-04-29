@@ -1,48 +1,46 @@
 // ══════════════════════════════════════════════
-// ROUTES/AUTH.JS — Đăng ký & Đăng nhập Học Sinh
+// ROUTES/AUTH.JS — Học sinh đăng ký / đăng nhập
 // ══════════════════════════════════════════════
 const express = require('express');
 const router  = express.Router();
 const bcrypt  = require('bcryptjs');
 const db      = require('../db');
 
-// POST /api/auth/register — Học sinh
+// POST /api/auth/register
 router.post('/register', async (req, res) => {
-  const { username, password, displayName, class_code, birth_year, phone } = req.body;
-  if (!username || !password)
-    return res.status(400).json({ error: 'Thiếu username hoặc password' });
-  if (!class_code)
-    return res.status(400).json({ error: 'Vui lòng nhập mã lớp học' });
+  const { username, password, displayName, teacher_code, birth_year } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Thiếu username hoặc password' });
+  if (!displayName)           return res.status(400).json({ error: 'Vui lòng nhập họ và tên' });
+  if (!teacher_code)          return res.status(400).json({ error: 'Vui lòng nhập mã giáo viên' });
 
+  // Kiểm tra mã GV
   try {
-    const [classes] = await db.query('SELECT class_code FROM classes WHERE class_code = ?', [class_code.toUpperCase()]);
-    if (!classes.length)
-      return res.status(404).json({ error: 'Mã lớp học không tồn tại. Hãy hỏi giáo viên!' });
-  } catch(e) {
-    return res.status(500).json({ error: e.message });
-  }
+    const [tc] = await db.query(
+      'SELECT teacher_code FROM teachers WHERE teacher_code = ?',
+      [teacher_code.toUpperCase()]
+    );
+    if (!tc.length) return res.status(404).json({ error: 'Mã giáo viên không tồn tại!' });
+  } catch(e) { return res.status(500).json({ error: e.message }); }
 
   try {
     const hash = await bcrypt.hash(password, 10);
     const [result] = await db.query(
-      'INSERT INTO users (username, password_hash, display_name, class_code, birth_year, phone, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [username, hash, displayName || username, class_code.toUpperCase(), birth_year || null, phone || null, 'student']
+      'INSERT INTO users (username, password_hash, display_name, teacher_code, birth_year, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [username.toLowerCase(), hash, displayName, teacher_code.toUpperCase(), birth_year||null, 'student']
     );
-    res.json({ success: true, user_id: result.insertId, username, displayName: displayName || username });
+    res.json({ success: true, user_id: result.insertId, username, displayName });
   } catch(e) {
-    if (e.code === 'ER_DUP_ENTRY')
-      return res.status(409).json({ error: 'Tên đăng nhập đã tồn tại' });
+    if (e.code === 'ER_DUP_ENTRY') return res.status(409).json({ error: 'Tên đăng nhập đã tồn tại' });
     res.status(500).json({ error: e.message });
   }
 });
 
-// POST /api/auth/login — Học sinh
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password)
-    return res.status(400).json({ error: 'Thiếu username hoặc password' });
+  if (!username || !password) return res.status(400).json({ error: 'Thiếu username hoặc password' });
   try {
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username.toLowerCase()]);
     if (!rows.length) return res.status(404).json({ error: 'Tài khoản không tồn tại' });
     const user = rows[0];
     const ok = await bcrypt.compare(password, user.password_hash);

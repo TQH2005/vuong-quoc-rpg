@@ -2,7 +2,7 @@ function drawBattleScene(atk,def,animType){
   const bc=bctx;
   bc.clearRect(0,0,bcv.width,bcv.height);
   // Scale toàn bộ nội dung theo kích thước canvas thực tế
-  const _scaleX=bcv.width/440, _scaleY=bcv.height/130;
+  const _scaleX=bcv.width/440, _scaleY=bcv.height/200;
   bc.save();
   bc.scale(_scaleX,_scaleY);
 
@@ -640,12 +640,31 @@ function drawBattleScene(atk,def,animType){
   else P.attackAnim=0;
   drawKnight(bc, 36+pShake, groundY-80, false, false, frameCount, !atk);
   P.attackAnim=_savedAtk; // restore
-  // Thiêu đốt: nhân vật ửng đỏ (không hiệu ứng lửa bay)
+  // Thiêu đốt: nhân vật ửng đỏ + lửa dưới chân
   if(bPlayerBurnTurns>0){
     bc.save();
     bc.globalAlpha=0.28+Math.sin(frameCount*0.18)*0.1;
     bc.fillStyle='#ff2200';
     bc.fillRect(36+pShake-2, groundY-82, 56, 86);
+    bc.restore();
+    // Lửa dưới chân nhân vật
+    bc.save();
+    const _fx=62+pShake, _fy=groundY;
+    for(let _fi=0;_fi<3;_fi++){
+      const _foff=(_fi-1)*14;
+      const _fh=22+Math.abs(Math.sin(frameCount*0.15+_fi*1.1))*16;
+      const _fg=bc.createLinearGradient(_fx+_foff,_fy,_fx+_foff,_fy-_fh);
+      _fg.addColorStop(0,'rgba(255,50,0,0.95)');
+      _fg.addColorStop(0.4,'rgba(255,140,0,0.8)');
+      _fg.addColorStop(1,'rgba(255,230,0,0)');
+      bc.fillStyle=_fg;
+      bc.beginPath();
+      const _fw=7+Math.sin(frameCount*0.2+_fi)*3;
+      bc.moveTo(_fx+_foff-_fw,_fy);
+      bc.quadraticCurveTo(_fx+_foff,_fy-_fh*0.6,_fx+_foff+_fw*0.3,_fy-_fh);
+      bc.quadraticCurveTo(_fx+_foff+_fw*0.8,_fy-_fh*0.5,_fx+_foff+_fw,_fy);
+      bc.closePath();bc.fill();
+    }
     bc.restore();
   }
   // Hurt flash: tint đỏ khi bị đánh

@@ -1,6 +1,10 @@
 function drawBattleScene(atk,def,animType){
   const bc=bctx;
   bc.clearRect(0,0,bcv.width,bcv.height);
+  // Scale toàn bộ nội dung theo kích thước canvas thực tế
+  const _scaleX=bcv.width/440, _scaleY=bcv.height/200;
+  bc.save();
+  bc.scale(_scaleX,_scaleY);
 
   // Night battle: shift background to blood red/purple
   const night=isNightTime();
@@ -957,6 +961,7 @@ function drawBattleScene(atk,def,animType){
   bc.fillText('VS',BW/2,groundY-46);
   bc.restore();
 
+  bc.restore();
 }
 function updateBHUD(){
   document.getElementById('b-php').style.width=(bPHP/bMaxPHP*100)+'%';

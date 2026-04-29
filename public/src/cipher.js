@@ -33,35 +33,15 @@ setInterval(()=>{
   } else { _castleHintShown=false; }
 }, 1000);
 
-// ── Patch ocean floor walk-through (line ~9601) ────────────────────────
-// Thay thế đoạn inline bằng hàm _tryAdvanceOceanFloor
-// Vì code nằm trong drawOcean inline, ta dùng MutationObserver không được
-// → Patch bằng override biến sau khi file load: sử dụng cờ _oceanDoor9Override
-// Cách đơn giản nhất: wrap updateOcean nếu có, hoặc dùng event check mỗi frame
-// Ta đã define _tryAdvanceOceanFloor; giờ patch bằng cách ghi đè nội dung liên quan
-// Thực tế code tại dòng 9601 là:
-//   if(oceanFloor<10){oceanFloor++;...}else{exitOceanWorld()...}
-// Ta không thể str_replace runtime, nhưng ta có thể override bằng cách:
-// Wrap _origUpdateOcean/drawOcean nếu chúng tồn tại
-// => Dùng approach: check mỗi frame trong game loop
 (function(){
-  // Patch: mỗi khi player ở gần door tầng 9 ocean và floor cleared → intercept
-  // Ta override bằng cách set flag rồi check trong _tryAdvanceOceanFloor
-  // Nhưng code advance nằm trong drawOcean inline nên cần patch khác:
-  // Override oceanFloor setter bằng defineProperty
   let _oceanFloorVal = typeof oceanFloor !== 'undefined' ? oceanFloor : 1;
-  // Không thể dễ dàng defineProperty cho let variable
-  // => Approach thực tế: patch bằng cách monitor & rollback sau khi advance
-  // khi floor 9 cleared và chưa unlock → nếu oceanFloor đã thành 10, rollback + show dialog
   let _prevOceanFloor = _oceanFloorVal;
   setInterval(()=>{
     if(typeof oceanFloor === 'undefined' || !inOcean) return;
     if(oceanFloor === 10 && !thuLongUnlocked && !window._oceanDoor9BlockHandled){
-      // Bị advance tự động → rollback
       oceanFloor = 9;
       oceanFloorCleared = true;
       oceanBattleActive = false;
-      // Hiện dialog
       window._oceanDoor9BlockHandled = true;
       _showBossDialog(
         '🌊 CỔNG TẦNG 10 ĐẠI DƯƠNG',

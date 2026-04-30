@@ -110,7 +110,7 @@ function _tryAdvanceOceanFloor(){
         '🔥 CỔNG ĐỊA NGỤC — TẦNG 10',
         'Một cánh cổng khổng lồ bằng đá đen, họa tiết lửa bao quanh rừng rực... Hỏa Long Vương rít lên: "Trước khi vào, hãy giải mật mã này — nếu không ngươi sẽ tan thành tro!"',
         '🔐 GIẢI MẬT MÃ',
-        () => openMinigame('cipher',
+        () => openMinigame('sudoku',
           () => { // thắng
             hoaLongUnlocked = true;
             _orig(); // advance thật — vào tầng 10
@@ -220,7 +220,6 @@ function closeMinigame(won){
 function _buildMinigameHTML(type){
   if(type==='chess')  return _chessHTML();
   if(type==='caro')   return _caroHTML();
-  if(type==='cipher') return _cipherHTML();
   if(type==='sudoku') return typeof _sudokuHTML==='function'?_sudokuHTML():'<div style="color:#fff;padding:40px;text-align:center">⏳ Đang tải Sudoku...</div>';
   return '';
 }
@@ -441,5 +440,4 @@ function _cipherHTML(){
 function _initMG(type){
   if(type==='chess')  _csInit();
   if(type==='caro')   _crInit();
-  if(type==='cipher') _cpGen();
 }

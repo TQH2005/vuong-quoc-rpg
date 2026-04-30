@@ -98,6 +98,7 @@ function _sudokuHTML(){
   font-size:clamp(13px,3.5vw,20px);font-weight:700;cursor:pointer;
   border:1px solid #3a2010;position:relative;transition:background .15s;
   user-select:none;-webkit-tap-highlight-color:transparent;
+  color:#e8d5a3;
 }
 /* Box borders */
 .sdk-cell[data-c="2"],.sdk-cell[data-c="5"]{border-right:2.5px solid #8B6914;}
@@ -216,12 +217,11 @@ let _sdkTimerEl=null, _sdkTimerSec=0, _sdkTimerInt=null;
 let _sdkHints=3, _sdkOver=false;
 
 // Fire burn system
-let _sdkFireInt=null;
-let _sdkBurning=new Set();
-let _sdkBurned=new Set();
-const _SDK_FIRE_PROB=[0,0.20,0.25,0.30];
-const _SDK_FIRE_INTERVAL=8000;
-const _SDK_DIFF_HOLES=[38,46,52]; // số ô ẩn theo độ khó
+let _sdkFireInt=null;        // interval kiểm tra đốt ô
+let _sdkBurning=new Set();   // set 'r,c' đang cháy (animation)
+let _sdkBurned=new Set();    // set 'r,c' đã bị xóa (cần điền lại)
+const _SDK_FIRE_PROB=[0,0.20,0.25,0.30]; // xác suất theo độ khó
+const _SDK_FIRE_INTERVAL=8000;           // kiểm tra mỗi 8 giây
 
 function _sdkSetDiff(d){
   _sdkDiff=d;
@@ -273,9 +273,6 @@ function _sdkNewGame(){
 function _sdkRender(){
   const board=document.getElementById('sdk-board');
   if(!board) return;
-  // Đảm bảo board có style grid
-  board.style.display='grid';
-  board.style.gridTemplateColumns='repeat(9,1fr)';
   board.innerHTML='';
   for(let r=0;r<9;r++){
     for(let c=0;c<9;c++){
@@ -473,6 +470,7 @@ function _sdkComplete(){
 function _sdkOnWin(){
   clearInterval(_sdkTimerInt);
   clearInterval(_sdkFireInt);
+  document.removeEventListener('keydown', _sdkKeyHandler);
   closeMinigame(true);
 }
 
@@ -489,19 +487,10 @@ function _sdkKeyHandler(e){
   if(e.key==='ArrowLeft'&&c>0)  { _sdkSel=[r,c-1]; _sdkRender(); }
   if(e.key==='ArrowRight'&&c<8) { _sdkSel=[r,c+1]; _sdkRender(); }
 }
-document.addEventListener('keydown', _sdkKeyHandler);
+// keydown được add trong _initSudoku và remove khi closeMinigame
 
 // ── Export: init function called by minigame.js ──
 window._initSudoku = function(){
-  _sdkDiff = 1;
-  // Retry cho đến khi #sdk-board có trong DOM
-  function tryInit(attempts){
-    const board = document.getElementById('sdk-board');
-    if(board){
-      _sdkNewGame();
-    } else if(attempts > 0){
-      setTimeout(()=>tryInit(attempts-1), 80);
-    }
-  }
-  tryInit(10);
+  _sdkDiff=1;
+  _sdkNewGame();
 };

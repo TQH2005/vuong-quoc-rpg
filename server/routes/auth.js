@@ -45,7 +45,13 @@ router.post('/login', async (req, res) => {
     const user = rows[0];
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: 'Sai mật khẩu' });
-    res.json({ success: true, user_id: user.id, username: user.username, displayName: user.display_name, teacher_code: user.teacher_code || null });
+    res.json({
+      success: true,
+      user_id: user.id,
+      username: user.username,
+      displayName: user.display_name,
+      teacher_code: user.teacher_code || ''
+    });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }

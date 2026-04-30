@@ -568,13 +568,13 @@ function setRkSort(s){
 }
 
 async function loadRanking(){
-  // Lấy mã lớp từ tài khoản đang đăng nhập
+  // Lấy teacher_code từ tài khoản học sinh đang đăng nhập
   const classCode = window._currentTeacherCode || window._currentClass || '';
   const labelEl = document.getElementById('rk-class-label');
   if(!classCode){
     labelEl.textContent = 'Bạn chưa có mã lớp học';
     document.getElementById('rk-err').style.display='block';
-    document.getElementById('rk-err').textContent='❌ Tài khoản chưa được gán mã lớp!';
+    document.getElementById('rk-err').textContent='❌ Tài khoản chưa được gán mã giáo viên!';
     return;
   }
   labelEl.textContent = '🏫 Mã lớp: ' + classCode;
@@ -582,12 +582,22 @@ async function loadRanking(){
   document.getElementById('rk-loading').style.display='block';
   document.getElementById('rk-rows').innerHTML='';
   try {
-    const res = await fetch('/api/ranking?classCode='+encodeURIComponent(classCode));
+    // Gọi API teacher/students để lấy danh sách học sinh cùng lớp
+    const res = await fetch('/api/teacher/students/'+encodeURIComponent(classCode));
     if(!res.ok) throw new Error('not found');
     const data = await res.json();
     if(data.error) throw new Error(data.error);
     document.getElementById('rk-loading').style.display='none';
-    _rkData = data.members || [];
+    // Chuyển đổi format để khớp với renderRkRows
+    _rkData = data.map(s=>({
+      name: s.name,
+      username: s.username,
+      level: s.level||1,
+      exp: s.exp||0,
+      gold: s.gold||0,
+      avgPct: 0, // không có dữ liệu chi tiết môn học
+      stats: typeof s.stats==='string'?JSON.parse(s.stats||'{}'):(s.stats||{})
+    }));
     if(_rkData.length === 0){
       document.getElementById('rk-rows').innerHTML='<div style="text-align:center;color:#7a5820;padding:20px;font-size:12px;">📭 Chưa có học sinh nào trong lớp này</div>';
       return;

@@ -50,7 +50,9 @@
       return;
     }
     btn.textContent='✅ ĐANG VÀO...';
-    setTimeout(()=>enterGame(res.user_id, user, res.displayName, res.teacher_code), 500);
+    // Lưu teacher_code để bảng xếp hạng dùng
+    window._currentTeacherCode = res.teacher_code || '';
+    setTimeout(()=>enterGame(res.user_id, user, res.displayName), 500);
   };
 
   // ══════════════════════════════════════════
@@ -78,7 +80,8 @@
       return;
     }
     setMsg('lg-reg-ok','✅ Đăng ký thành công! Đang vào game...', true);
-    setTimeout(()=>enterGame(res.user_id, user, name, tccode), 800);
+    window._currentTeacherCode = tccode || '';
+    setTimeout(()=>enterGame(res.user_id, user, name), 800);
   };
 
   // ══════════════════════════════════════════
@@ -280,10 +283,9 @@
   // ══════════════════════════════════════════
   // VÀO GAME — Học sinh
   // ══════════════════════════════════════════
-  async function enterGame(userId, username, displayName, teacherCode){
+  async function enterGame(userId, username, displayName){
     window._currentUser   = username;
     window._currentUserId = userId;
-    window._currentClass  = teacherCode || window._currentClass || null;
     await window.loadGameData(userId);
     document.getElementById('login-screen').classList.add('off');
     wrap.style.visibility   = 'visible';

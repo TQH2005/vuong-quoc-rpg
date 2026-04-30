@@ -110,7 +110,7 @@ function _tryAdvanceOceanFloor(){
         '🔥 CỔNG ĐỊA NGỤC — TẦNG 10',
         'Một cánh cổng khổng lồ bằng đá đen, họa tiết lửa bao quanh rừng rực... Hỏa Long Vương rít lên: "Trước khi vào, hãy giải mật mã này — nếu không ngươi sẽ tan thành tro!"',
         '🔐 GIẢI MẬT MÃ',
-        () => openMinigame('cipher',
+        () => openMinigame('sudoku',
           () => { // thắng
             hoaLongUnlocked = true;
             _orig(); // advance thật — vào tầng 10
@@ -180,8 +180,8 @@ function openMinigame(type, onWin, onLose){
     title.textContent = '🌊 CỜ CARO — THÁCH ĐẤU THỦY LONG';
     hint.textContent  = 'Thắng cờ caro để vào tầng 10 đại dương';
   } else {
-    title.textContent = '🔐 MẬT MÃ — MỞ CỔNG ĐỊA NGỤC';
-    hint.textContent  = 'Giải đúng mật mã để vào tầng 10 lòng đất';
+    title.textContent = '🔢 Ô SỐ SUDOKU — MỞ CỔNG ĐỊA NGỤC';
+    hint.textContent  = 'Hoàn thành Sudoku để vào tầng 10 lòng đất';
   }
 
   inner.innerHTML = _buildMinigameHTML(type);
@@ -193,27 +193,21 @@ function openMinigame(type, onWin, onLose){
 }
 
 function closeMinigame(won){
-  // ── Dừng tất cả timer của Sudoku trước khi đóng ──
+  // Dừng timer Sudoku
   if(typeof _sdkTimerInt!=='undefined'&&_sdkTimerInt){clearInterval(_sdkTimerInt);_sdkTimerInt=null;}
   if(typeof _sdkFireInt !=='undefined'&&_sdkFireInt ){clearInterval(_sdkFireInt);_sdkFireInt=null;}
   if(typeof _sdkOver   !=='undefined') _sdkOver=true;
-  // Gỡ keyboard listener nếu có
-  if(typeof _sdkKeyHandler==='function'){
-    document.removeEventListener('keydown',_sdkKeyHandler);
-  }
   const overlay = document.getElementById('minigame-overlay');
   if(overlay) overlay.classList.remove('on');
-  const inner = document.getElementById('minigame-inner');
-  if(inner) inner.innerHTML = '';
-  // Khôi phục đúng gameState
+  const inner=document.getElementById('minigame-inner');
+  if(inner) inner.innerHTML='';
   if(typeof undergroundActive!=='undefined'&&undergroundActive) gameState='UNDERGROUND';
-  else if(typeof inOcean!=='undefined'&&inOcean) gameState='WORLD';
   else gameState='WORLD';
   if(!_mgPendingBoss) return;
   const { onWin, onLose } = _mgPendingBoss;
   _mgPendingBoss = null;
-  if(won && typeof onWin==='function') onWin();
-  else if(!won && typeof onLose==='function') onLose();
+  if(won && typeof onWin === 'function') onWin();
+  else if(!won && typeof onLose === 'function') onLose();
 }
 
 // ── Build HTML nội dung minigame ──────────────────────────────────────
@@ -221,7 +215,7 @@ function _buildMinigameHTML(type){
   if(type==='chess')  return _chessHTML();
   if(type==='caro')   return _caroHTML();
   if(type==='cipher') return _cipherHTML();
-  if(type==='sudoku') return typeof _sudokuHTML==='function'?_sudokuHTML():'<div style="color:#fff;padding:20px">Sudoku loading...</div>';
+  if(type==='sudoku') return typeof _sudokuHTML==='function'?_sudokuHTML():'<div style="color:#fff;padding:40px;text-align:center">⏳ Đang tải Sudoku...</div>';
   return '';
 }
 
@@ -445,5 +439,6 @@ function _initMG(type){
   if(type==='sudoku'){
     if(typeof _initSudoku==='function') _initSudoku();
     else if(typeof _sdkSetDiff==='function') _sdkSetDiff(1);
+    else if(typeof _sdkNewGame==='function') _sdkNewGame();
   }
 }

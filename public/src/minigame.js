@@ -108,9 +108,9 @@ function _tryAdvanceOceanFloor(){
     if(undergroundFloor === 9 && !hoaLongUnlocked){
       _showBossDialog(
         '🔥 CỔNG ĐỊA NGỤC — TẦNG 10',
-        'Một cánh cổng khổng lồ bằng đá đen, họa tiết lửa bao quanh rừng rực... Hỏa Long Vương rít lên: "Trước khi vào, hãy giải ô số này — nếu không ngươi sẽ tan thành tro!"',
-        '🔢 GIẢI Ô SỐ SUDOKU',
-        () => openMinigame('sudoku',
+        'Một cánh cổng khổng lồ bằng đá đen, họa tiết lửa bao quanh rừng rực... Hỏa Long Vương rít lên: "Trước khi vào, hãy giải mật mã này — nếu không ngươi sẽ tan thành tro!"',
+        '🔐 GIẢI MẬT MÃ',
+        () => openMinigame('cipher',
           () => { // thắng
             hoaLongUnlocked = true;
             _orig(); // advance thật — vào tầng 10
@@ -171,9 +171,7 @@ function openMinigame(type, onWin, onLose){
   const hint    = document.getElementById('minigame-hint');
 
   overlay.style.background = type==='chess' ? '#06040a'
-    : type==='caro' ? '#000c1a'
-    : type==='sudoku' ? '#0a0500'
-    : '#0d0805';
+    : type==='caro' ? '#000c1a' : '#0d0805';
 
   if(type==='chess'){
     title.textContent = '♟ CỜ VUA — THÁCH ĐẤU HẮC LONG';
@@ -181,9 +179,6 @@ function openMinigame(type, onWin, onLose){
   } else if(type==='caro'){
     title.textContent = '🌊 CỜ CARO — THÁCH ĐẤU THỦY LONG';
     hint.textContent  = 'Thắng cờ caro để vào tầng 10 đại dương';
-  } else if(type==='sudoku'){
-    title.textContent = '🔥 Ô SỐ SUDOKU — MỞ CỔNG ĐỊA NGỤC';
-    hint.textContent  = 'Hoàn thành Sudoku để vào tầng 10 lòng đất';
   } else {
     title.textContent = '🔐 MẬT MÃ — MỞ CỔNG ĐỊA NGỤC';
     hint.textContent  = 'Giải đúng mật mã để vào tầng 10 lòng đất';
@@ -193,28 +188,32 @@ function openMinigame(type, onWin, onLose){
   overlay.classList.add('on');
   gameState = 'MINIGAME';
 
-  // Sudoku cần thêm thời gian để DOM render xong
-  const delay = type==='sudoku' ? 200 : 80;
-  setTimeout(()=>{ _initMG(type); }, delay);
+  // Init game sau khi DOM render
+  setTimeout(()=>{ _initMG(type); }, 80);
 }
 
 function closeMinigame(won){
-  const overlay = document.getElementById('minigame-overlay');
-  overlay.classList.remove('on');
-  document.getElementById('minigame-inner').innerHTML = '';
-  // Khôi phục đúng gameState theo context
-  if(typeof undergroundActive!=='undefined' && undergroundActive){
-    gameState = 'UNDERGROUND';
-  } else if(typeof inOcean!=='undefined' && inOcean){
-    gameState = 'WORLD';
-  } else {
-    gameState = 'WORLD';
+  // ── Dừng tất cả timer của Sudoku trước khi đóng ──
+  if(typeof _sdkTimerInt!=='undefined'&&_sdkTimerInt){clearInterval(_sdkTimerInt);_sdkTimerInt=null;}
+  if(typeof _sdkFireInt !=='undefined'&&_sdkFireInt ){clearInterval(_sdkFireInt);_sdkFireInt=null;}
+  if(typeof _sdkOver   !=='undefined') _sdkOver=true;
+  // Gỡ keyboard listener nếu có
+  if(typeof _sdkKeyHandler==='function'){
+    document.removeEventListener('keydown',_sdkKeyHandler);
   }
+  const overlay = document.getElementById('minigame-overlay');
+  if(overlay) overlay.classList.remove('on');
+  const inner = document.getElementById('minigame-inner');
+  if(inner) inner.innerHTML = '';
+  // Khôi phục đúng gameState
+  if(typeof undergroundActive!=='undefined'&&undergroundActive) gameState='UNDERGROUND';
+  else if(typeof inOcean!=='undefined'&&inOcean) gameState='WORLD';
+  else gameState='WORLD';
   if(!_mgPendingBoss) return;
   const { onWin, onLose } = _mgPendingBoss;
   _mgPendingBoss = null;
-  if(won && typeof onWin === 'function') onWin();
-  else if(!won && typeof onLose === 'function') onLose();
+  if(won && typeof onWin==='function') onWin();
+  else if(!won && typeof onLose==='function') onLose();
 }
 
 // ── Build HTML nội dung minigame ──────────────────────────────────────
@@ -222,7 +221,7 @@ function _buildMinigameHTML(type){
   if(type==='chess')  return _chessHTML();
   if(type==='caro')   return _caroHTML();
   if(type==='cipher') return _cipherHTML();
-  if(type==='sudoku') return _sudokuHTML();
+  if(type==='sudoku') return typeof _sudokuHTML==='function'?_sudokuHTML():'<div style="color:#fff;padding:20px">Sudoku loading...</div>';
   return '';
 }
 
@@ -443,5 +442,8 @@ function _initMG(type){
   if(type==='chess')  _csInit();
   if(type==='caro')   _crInit();
   if(type==='cipher') _cpGen();
-  if(type==='sudoku' && typeof _initSudoku==='function') _initSudoku();
+  if(type==='sudoku'){
+    if(typeof _initSudoku==='function') _initSudoku();
+    else if(typeof _sdkSetDiff==='function') _sdkSetDiff(1);
+  }
 }

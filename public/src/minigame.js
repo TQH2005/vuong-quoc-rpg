@@ -203,15 +203,17 @@ function closeMinigame(won){
   if(overlay) overlay.classList.remove('on');
   const inner = document.getElementById('minigame-inner');
   if(inner) inner.innerHTML = '';
-  // Restore đúng gameState
+  // Restore đúng gameState TRƯỚC khi gọi callback
   if(typeof undergroundActive!=='undefined'&&undergroundActive) gameState='UNDERGROUND';
-  else if(typeof inOcean!=='undefined'&&inOcean) gameState='WORLD';
   else gameState='WORLD';
   if(!_mgPendingBoss) return;
   const { onWin, onLose } = _mgPendingBoss;
   _mgPendingBoss = null;
-  if(won && typeof onWin === 'function') onWin();
-  else if(!won && typeof onLose === 'function') onLose();
+  // Dùng setTimeout để DOM/state kịp cập nhật trước callback
+  setTimeout(()=>{
+    if(won && typeof onWin === 'function') onWin();
+    else if(!won && typeof onLose === 'function') onLose();
+  }, 50);
 }
 
 // ── Build HTML nội dung minigame ──────────────────────────────────────
@@ -219,6 +221,7 @@ function _buildMinigameHTML(type){
   if(type==='chess')  return _chessHTML();
   if(type==='caro')   return _caroHTML();
   if(type==='cipher') return _cipherHTML();
+  if(type==='sudoku') return typeof _sudokuHTML==='function'?_sudokuHTML():'<div style="color:#fff;padding:40px;text-align:center">⏳ Đang tải Sudoku...</div>';
   return '';
 }
 

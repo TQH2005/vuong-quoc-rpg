@@ -43,6 +43,9 @@ function showNotif(txt){
 // ═══════════════════════════════════════════
 window.addEventListener('keydown',e=>{
   if(_cheatOpen) return; // console đang mở — không truyền phím xuống game
+  // Không chặn phím khi đang gõ vào input/textarea
+  const _tag=document.activeElement?.tagName;
+  if(_tag==='INPUT'||_tag==='TEXTAREA') return;
   keys[e.key]=true;
   if(['ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();
   if(e.key==='w'||e.key==='W'||e.key==='ArrowUp'||e.key===' ')jumpPressed=true;
@@ -70,7 +73,7 @@ window.addEventListener('keydown',e=>{
     }
   }
   if((e.key==='b'||e.key==='B')&&(gameState==='WORLD'||gameState==='INDOOR'))openShop();
-  if((e.key==='i'||e.key==='I')&&(gameState==='WORLD'||gameState==='INDOOR'||gameState==='OCEAN'||gameState==='UNDERGROUND'))openBag();
+  if((e.key==='i'||e.key==='I')&&(gameState==='WORLD'||gameState==='INDOOR'))openBag();
   if((e.key==='i'||e.key==='I')&&gameState==='BAG')closeBag();
   if((e.key==='t'||e.key==='T')&&!_cheatOpen&&gameState!=='BATTLE'&&gameState!=='PUZZLE'){
     // Chỉ mở console khi đã đăng nhập (login-screen đã ẩn)

@@ -216,11 +216,12 @@ let _sdkTimerEl=null, _sdkTimerSec=0, _sdkTimerInt=null;
 let _sdkHints=3, _sdkOver=false;
 
 // Fire burn system
-let _sdkFireInt=null;        // interval kiểm tra đốt ô
-let _sdkBurning=new Set();   // set 'r,c' đang cháy (animation)
-let _sdkBurned=new Set();    // set 'r,c' đã bị xóa (cần điền lại)
-const _SDK_FIRE_PROB=[0,0.20,0.25,0.30]; // xác suất theo độ khó
-const _SDK_FIRE_INTERVAL=8000;           // kiểm tra mỗi 8 giây
+let _sdkFireInt=null;
+let _sdkBurning=new Set();
+let _sdkBurned=new Set();
+const _SDK_FIRE_PROB=[0,0.20,0.25,0.30];
+const _SDK_FIRE_INTERVAL=8000;
+const _SDK_DIFF_HOLES=[38,46,52]; // số ô ẩn theo độ khó
 
 function _sdkSetDiff(d){
   _sdkDiff=d;

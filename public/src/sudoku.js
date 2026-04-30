@@ -272,6 +272,9 @@ function _sdkNewGame(){
 function _sdkRender(){
   const board=document.getElementById('sdk-board');
   if(!board) return;
+  // Đảm bảo board có style grid
+  board.style.display='grid';
+  board.style.gridTemplateColumns='repeat(9,1fr)';
   board.innerHTML='';
   for(let r=0;r<9;r++){
     for(let c=0;c<9;c++){
@@ -489,6 +492,15 @@ document.addEventListener('keydown', _sdkKeyHandler);
 
 // ── Export: init function called by minigame.js ──
 window._initSudoku = function(){
-  _sdkDiff=1;
-  _sdkNewGame();
+  _sdkDiff = 1;
+  // Retry cho đến khi #sdk-board có trong DOM
+  function tryInit(attempts){
+    const board = document.getElementById('sdk-board');
+    if(board){
+      _sdkNewGame();
+    } else if(attempts > 0){
+      setTimeout(()=>tryInit(attempts-1), 80);
+    }
+  }
+  tryInit(10);
 };

@@ -193,8 +193,9 @@ function openMinigame(type, onWin, onLose){
   overlay.classList.add('on');
   gameState = 'MINIGAME';
 
-  // Init game sau khi DOM render
-  setTimeout(()=>{ _initMG(type); }, 80);
+  // Sudoku cần thêm thời gian để DOM render xong
+  const delay = type==='sudoku' ? 200 : 80;
+  setTimeout(()=>{ _initMG(type); }, delay);
 }
 
 function closeMinigame(won){

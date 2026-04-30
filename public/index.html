@@ -58,15 +58,15 @@
     <div class="lg-box" style="gap:10px;">
       <div>
         <div class="lg-lbl">👤 Họ và tên thật</div>
-        <input class="lg-inp" id="rg-name" type="text" placeholder="Nguyễn Văn A..." autocomplete="name" spellcheck="false" inputmode="text"/>
+        <input class="lg-inp" id="rg-name" type="text" placeholder="Nguyễn Văn A..." autocomplete="off" spellcheck="false"/>
       </div>
       <div>
         <div class="lg-lbl">🎂 Năm sinh</div>
         <input class="lg-inp" id="rg-born" type="number" placeholder="VD: 2015" min="2000" max="2020"/>
       </div>
       <div>
-        <div class="lg-lbl">🏫 Mã giáo viên <span style="color:#aaa;font-size:11px">(hỏi giáo viên)</span></div>
-        <input class="lg-inp" id="rg-tccode" type="text" placeholder="VD: TCAB1234" autocomplete="off" spellcheck="false" style="text-transform:uppercase"/>
+        <div class="lg-lbl">🏫 Mã lớp học <span style="color:#aaa;font-size:11px">(hỏi giáo viên)</span></div>
+        <input class="lg-inp" id="rg-class" type="text" placeholder="VD: ABC123" autocomplete="off" spellcheck="false" style="text-transform:uppercase"/>
       </div>
       <div>
         <div class="lg-lbl">🔑 Tên tài khoản</div>
@@ -518,105 +518,147 @@
 
 <!-- ── BẢNG XẾP HẠNG LỚP ── -->
 <div id="ranking-overlay" style="display:none;position:fixed;inset:0;z-index:29999;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;">
-  <div style="max-width:520px;width:94%;background:linear-gradient(135deg,#0a0800,#1a1200);border:2px solid #8B6914;border-radius:8px;padding:24px 20px;font-family:'Times New Roman',serif;box-shadow:0 0 40px rgba(255,215,0,0.15);">
-    <div style="text-align:center;font-size:18px;font-weight:900;letter-spacing:3px;color:#ffd700;margin-bottom:4px;">🏆 BẢNG XẾP HẠNG</div>
-    <div style="text-align:center;font-size:11px;color:#7a5820;margin-bottom:16px;">Nhập mã lớp để xem kết quả của lớp bạn</div>
-    <!-- Nhập mã lớp -->
-    <div id="rk-input-section">
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input id="rk-code-inp" type="text" placeholder="Nhập mã lớp (VD: TOAN7A)..." autocomplete="off" spellcheck="false"
-          style="flex:1;background:rgba(0,0,0,0.4);border:1px solid #4a3010;border-radius:4px;color:#e8d5a3;font-size:12px;padding:8px 10px;font-family:'Times New Roman',serif;outline:none;"/>
-        <button onclick="doRankingLookup()" style="padding:8px 14px;background:linear-gradient(135deg,#4a2800,#8B4500);border:1px solid #ffd700;border-radius:4px;color:#ffd700;font-size:12px;cursor:pointer;font-family:'Times New Roman',serif;white-space:nowrap;">🔍 Tra</button>
-      </div>
-      <div id="rk-err" style="display:none;color:#e74c3c;font-size:11px;text-align:center;margin-bottom:8px;">❌ Không tìm thấy mã lớp!</div>
-    </div>
-    <!-- Danh sách xếp hạng -->
-    <div id="rk-list" style="display:none;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div id="rk-class-name" style="font-size:13px;color:#ffd700;font-weight:700;"></div>
-        <div style="font-size:10px;color:#7a5820;cursor:pointer;" onclick="document.getElementById('rk-list').style.display='none';document.getElementById('rk-input-section').style.display='';">↩ Đổi lớp</div>
-      </div>
-      <div id="rk-rows" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;"></div>
+  <div style="max-width:560px;width:96%;background:linear-gradient(135deg,#0a0800,#1a1200);border:2px solid #8B6914;border-radius:10px;padding:24px 20px;font-family:'Times New Roman',serif;box-shadow:0 0 40px rgba(255,215,0,0.2);max-height:90vh;display:flex;flex-direction:column;">
+    <!-- Header -->
+    <div style="text-align:center;font-size:20px;font-weight:900;letter-spacing:3px;color:#ffd700;margin-bottom:2px;">🏆 BẢNG XẾP HẠNG</div>
+    <div id="rk-class-label" style="text-align:center;font-size:11px;color:#7a5820;margin-bottom:14px;">Đang tải...</div>
+    <!-- Tabs sắp xếp -->
+    <div id="rk-tabs" style="display:flex;gap:6px;margin-bottom:12px;justify-content:center;">
+      <button class="rk-tab act" onclick="setRkSort('level')">⭐ Level</button>
+      <button class="rk-tab" onclick="setRkSort('exp')">✨ EXP</button>
+      <button class="rk-tab" onclick="setRkSort('pct')">🎯 Điểm TB</button>
     </div>
     <!-- Loading -->
     <div id="rk-loading" style="display:none;text-align:center;color:#7a5820;font-size:13px;padding:20px;">⏳ Đang tải...</div>
-    <div style="text-align:center;margin-top:16px;">
-      <button onclick="closeRanking()" style="padding:8px 24px;background:rgba(0,0,0,0.4);border:1px solid #4a3010;border-radius:4px;color:#7a5820;font-size:12px;cursor:pointer;font-family:'Times New Roman',serif;">✕ Đóng</button>
+    <div id="rk-err" style="display:none;color:#e74c3c;font-size:11px;text-align:center;margin-bottom:8px;"></div>
+    <!-- Danh sách -->
+    <div id="rk-rows" style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1;"></div>
+    <!-- Footer -->
+    <div style="text-align:center;margin-top:14px;flex-shrink:0;">
+      <button onclick="loadRanking()" style="padding:6px 16px;background:rgba(255,215,0,0.1);border:1px solid #8B6914;border-radius:4px;color:#ffd700;font-size:11px;cursor:pointer;font-family:inherit;margin-right:8px;">🔄 Làm mới</button>
+      <button onclick="closeRanking()" style="padding:6px 20px;background:rgba(0,0,0,0.4);border:1px solid #4a3010;border-radius:4px;color:#7a5820;font-size:12px;cursor:pointer;font-family:'Times New Roman',serif;">✕ Đóng</button>
     </div>
   </div>
 </div>
 
+<style>
+.rk-tab{padding:5px 14px;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:4px;color:#7a5820;font-size:11px;cursor:pointer;font-family:'Times New Roman',serif;transition:all .2s;}
+.rk-tab.act{background:rgba(255,215,0,0.2);border-color:#ffd700;color:#ffd700;}
+.rk-tab:hover{border-color:#ffd700;color:#ffd700;}
+</style>
+
 <script>
 // ── Bảng xếp hạng lớp ────────────────────────
+let _rkData = [];
+let _rkSort = 'level';
+
 function openRanking(){
   document.getElementById('ranking-overlay').style.display='flex';
-  document.getElementById('rk-err').style.display='none';
-  document.getElementById('rk-list').style.display='none';
-  document.getElementById('rk-loading').style.display='none';
-  document.getElementById('rk-input-section').style.display='';
+  loadRanking();
 }
 function closeRanking(){
   document.getElementById('ranking-overlay').style.display='none';
 }
-document.getElementById('rk-code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')doRankingLookup();});
+
+function setRkSort(s){
+  _rkSort = s;
+  document.querySelectorAll('.rk-tab').forEach(t=>t.classList.remove('act'));
+  event.target.classList.add('act');
+  renderRkRows();
+}
+
+async function loadRanking(){
+  // Lấy mã lớp từ tài khoản đang đăng nhập
+  const classCode = window._currentTeacherCode || window._currentClass || '';
+  const labelEl = document.getElementById('rk-class-label');
+  if(!classCode){
+    labelEl.textContent = 'Bạn chưa có mã lớp học';
+    document.getElementById('rk-err').style.display='block';
+    document.getElementById('rk-err').textContent='❌ Tài khoản chưa được gán mã lớp!';
+    return;
+  }
+  labelEl.textContent = '🏫 Mã lớp: ' + classCode;
+  document.getElementById('rk-err').style.display='none';
+  document.getElementById('rk-loading').style.display='block';
+  document.getElementById('rk-rows').innerHTML='';
+  try {
+    const res = await fetch('/api/ranking?classCode='+encodeURIComponent(classCode));
+    if(!res.ok) throw new Error('not found');
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    document.getElementById('rk-loading').style.display='none';
+    _rkData = data.members || [];
+    if(_rkData.length === 0){
+      document.getElementById('rk-rows').innerHTML='<div style="text-align:center;color:#7a5820;padding:20px;font-size:12px;">📭 Chưa có học sinh nào trong lớp này</div>';
+      return;
+    }
+    labelEl.textContent = '🏫 Lớp: '+classCode+' — '+_rkData.length+' học sinh';
+    renderRkRows();
+  } catch(e){
+    document.getElementById('rk-loading').style.display='none';
+    const err=document.getElementById('rk-err');
+    err.style.display='block';
+    err.textContent='❌ Không tìm thấy lớp: '+classCode;
+  }
+}
 
 const SUBJ_NAMES_RK={math:'Toán',geo:'Địa',history:'Sử',literature:'Văn',civic:'GDCD',english:'Anh'};
 const SUBJ_ICONS_RK={math:'📐',geo:'🌍',history:'📜',literature:'📖',civic:'⚖️',english:'🔤'};
 
 function getRankLabel(pct){
   if(pct>=80) return {label:'Giỏi',color:'#2ecc40'};
-  if(pct>=65) return {label:'Khá',color:'#3498db'};
-  if(pct>=50) return {label:'TB',color:'#e67e22'};
-  return {label:'Yếu',color:'#e74c3c'};
+  if(pct>=65) return {label:'Khá', color:'#3498db'};
+  if(pct>=50) return {label:'TB',  color:'#e67e22'};
+  return       {label:'Yếu', color:'#e74c3c'};
 }
 
-async function doRankingLookup(){
-  const code = document.getElementById('rk-code-inp').value.trim().toUpperCase();
-  if(!code) return;
-  const err = document.getElementById('rk-err');
-  const list = document.getElementById('rk-list');
-  const loading = document.getElementById('rk-loading');
-  err.style.display='none'; list.style.display='none';
-  loading.style.display='block';
-  try {
-    const res = await fetch('/api/ranking?classCode='+encodeURIComponent(code));
-    if(!res.ok) throw new Error('not found');
-    const data = await res.json();
-    if(!data||!data.members||data.members.length===0) throw new Error('empty');
-    loading.style.display='none';
-    document.getElementById('rk-class-name').textContent='🏫 Lớp: '+code+' ('+data.members.length+' học sinh)';
-    const rows = document.getElementById('rk-rows');
-    rows.innerHTML='';
-    // Sắp xếp theo avgPct giảm dần
-    data.members.sort((a,b)=>(b.avgPct||0)-(a.avgPct||0));
-    data.members.forEach((m,i)=>{
-      const rank=i+1;
-      const pct=m.avgPct||0;
-      const rl=getRankLabel(pct);
-      const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
-      const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.3);border:1px solid #2a1a00;border-radius:6px;padding:8px 12px;';
-      row.innerHTML=`
-        <div style="font-size:16px;width:28px;text-align:center;">${medal}</div>
-        <div style="flex:1;">
-          <div style="font-size:12px;color:#e8d5a3;font-weight:700;">${m.displayName||m.username}</div>
-          <div style="font-size:10px;color:#7a5820;">@${m.username} &nbsp;·&nbsp; Lv${m.level||1}</div>
+function renderRkRows(){
+  const sorted = [..._rkData].sort((a,b)=>{
+    if(_rkSort==='level') return (b.level||1)-(a.level||1) || (b.exp||0)-(a.exp||0);
+    if(_rkSort==='exp')   return (b.exp||0)-(a.exp||0);
+    if(_rkSort==='pct')   return (b.avgPct||0)-(a.avgPct||0);
+    return 0;
+  });
+  const rows = document.getElementById('rk-rows');
+  rows.innerHTML='';
+  sorted.forEach((m,i)=>{
+    const rank = i+1;
+    const pct  = m.avgPct || 0;
+    const rl   = getRankLabel(pct);
+    const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':('<span style="font-size:11px;color:#7a5820">#'+rank+'</span>');
+    const isSelf = (m.username === window._currentUser);
+    const rowBg = isSelf
+      ? 'background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.4);'
+      : rank<=3
+        ? 'background:rgba(255,215,0,0.05);border:1px solid #2a1a00;'
+        : 'background:rgba(0,0,0,0.25);border:1px solid #1a1000;';
+    const subjectBars = Object.entries(SUBJ_NAMES_RK).map(([k,n])=>{
+      const sp = m.subjects&&m.subjects[k]&&m.subjects[k].answered>0
+        ? Math.round((m.subjects[k].correct||0)/m.subjects[k].answered*100) : 0;
+      const sl = getRankLabel(sp);
+      return `<div title="${n}" style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+        <div style="font-size:8px;color:#7a5820;">${SUBJ_ICONS_RK[k]}</div>
+        <div style="font-size:9px;color:${sl.color};font-weight:bold;">${sp}%</div>
+      </div>`;
+    }).join('');
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;align-items:center;gap:10px;${rowBg}border-radius:6px;padding:9px 12px;transition:background .2s;`;
+    row.innerHTML=`
+      <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${medal}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;color:${isSelf?'#ffd700':'#e8d5a3'};font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          ${m.displayName||m.username}${isSelf?' <span style="font-size:9px;color:#ffd700;">(bạn)</span>':''}
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
-          ${Object.entries(SUBJ_NAMES_RK).map(([k,n])=>{
-            const sp=m.subjects&&m.subjects[k]?Math.round((m.subjects[k].correct||0)/(m.subjects[k].answered||1)*100):0;
-            const sl=getRankLabel(sp);
-            return \`<div style="font-size:9px;color:\${sl.color};background:rgba(0,0,0,0.3);border:1px solid \${sl.color}44;border-radius:3px;padding:2px 5px;">\${SUBJ_ICONS_RK[k]}\${sp}%</div>\`;
-          }).join('')}
+        <div style="font-size:10px;color:#7a5820;margin-top:1px;">
+          ⭐Lv${m.level||1} &nbsp;·&nbsp; ✨${(m.exp||0).toLocaleString('vi-VN')} EXP &nbsp;·&nbsp; 🪙${(m.gold||0).toLocaleString('vi-VN')}
         </div>
-        <div style="font-size:13px;font-weight:700;color:\${rl.color};min-width:36px;text-align:right;">\${pct}%</div>`;
-      rows.appendChild(row);
-    });
-    list.style.display='block';
-  } catch(e){
-    loading.style.display='none';
-    err.style.display='block';
-  }
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;">${subjectBars}</div>
+      <div style="font-size:14px;font-weight:900;color:${rl.color};min-width:38px;text-align:right;flex-shrink:0;">
+        ${pct}%<div style="font-size:9px;font-weight:400;">${rl.label}</div>
+      </div>`;
+    rows.appendChild(row);
+  });
 }
 </script>
 </body>

@@ -50,7 +50,7 @@
       return;
     }
     btn.textContent='✅ ĐANG VÀO...';
-    setTimeout(()=>enterGame(res.user_id, user, res.displayName), 500);
+    setTimeout(()=>enterGame(res.user_id, user, res.displayName, res.teacher_code), 500);
   };
 
   // ══════════════════════════════════════════
@@ -78,7 +78,7 @@
       return;
     }
     setMsg('lg-reg-ok','✅ Đăng ký thành công! Đang vào game...', true);
-    setTimeout(()=>enterGame(res.user_id, user, name), 800);
+    setTimeout(()=>enterGame(res.user_id, user, name, tccode), 800);
   };
 
   // ══════════════════════════════════════════
@@ -280,9 +280,10 @@
   // ══════════════════════════════════════════
   // VÀO GAME — Học sinh
   // ══════════════════════════════════════════
-  async function enterGame(userId, username, displayName){
+  async function enterGame(userId, username, displayName, teacherCode){
     window._currentUser   = username;
     window._currentUserId = userId;
+    window._currentClass  = teacherCode || window._currentClass || null;
     await window.loadGameData(userId);
     document.getElementById('login-screen').classList.add('off');
     wrap.style.visibility   = 'visible';

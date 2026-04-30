@@ -202,7 +202,14 @@ function closeMinigame(won){
   const overlay = document.getElementById('minigame-overlay');
   overlay.classList.remove('on');
   document.getElementById('minigame-inner').innerHTML = '';
-  gameState = 'WORLD';
+  // Khôi phục đúng gameState theo context
+  if(typeof undergroundActive!=='undefined' && undergroundActive){
+    gameState = 'UNDERGROUND';
+  } else if(typeof inOcean!=='undefined' && inOcean){
+    gameState = 'WORLD';
+  } else {
+    gameState = 'WORLD';
+  }
   if(!_mgPendingBoss) return;
   const { onWin, onLose } = _mgPendingBoss;
   _mgPendingBoss = null;

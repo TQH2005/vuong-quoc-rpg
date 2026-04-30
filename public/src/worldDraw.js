@@ -1268,22 +1268,22 @@ let matchPairs={},wfFilled=[],wfSelChip=null,wfSelBlank=null;
 const weapons=[
   {id:'woodsword', name:'Kiếm Gỗ',    icon:'🪵', dmg:8,  price:0,   owned:true,  type:'melee',
    desc:'Vũ khí khởi đầu, không có hiệu ứng đặc biệt.'},
-  {id:'ironsword', name:'Kiếm Sắt',   icon:'⚔️', dmg:15, price:40,  owned:false, type:'melee',
+  {id:'ironsword', name:'Kiếm Sắt',   icon:'⚔️', dmg:15, price:500,  owned:false, type:'melee',
    desc:'20% tỉ lệ <b>Chí Mạng</b> — gây gấp đôi sát thương!', special:'crit', critChance:0.2},
-  {id:'fireaxe',   name:'Rìu Lửa',   icon:'🪓', dmg:30, price:80,  owned:false, type:'melee',
+  {id:'fireaxe',   name:'Rìu Lửa',   icon:'🪓', dmg:30, price:700,  owned:false, type:'melee',
    desc:'20% tỉ lệ <b>Thiêu Đốt</b> — mục tiêu mất 8 HP mỗi lượt (3 lượt)!', special:'burn', burnChance:0.2},
-  {id:'windsword', name:'Kiếm Gió',   icon:'🌀', dmg:30, price:85,  owned:false, type:'melee',
+  {id:'windsword', name:'Kiếm Gió',   icon:'🌀', dmg:30, price:1000,  owned:false, type:'melee',
    desc:'20% tỉ lệ <b>Đánh Đôi</b> — tung 2 đòn cùng lúc!', special:'double', doubleChance:0.2},
-  {id:'watersword',name:'Kiếm Thủy',  icon:'💧', dmg:30, price:90,  owned:false, type:'melee',
+  {id:'watersword',name:'Kiếm Thủy',  icon:'💧', dmg:30, price:1050,  owned:false, type:'melee',
    desc:'20% tỉ lệ <b>Hồi Mana</b> — hồi lại 1/4 mana tối đa!', special:'manaon', manaChance:0.2},
   // MAGIC
-  {id:'wand',      name:'Gậy Phép',   icon:'🪄', dmg:12, price:50,  owned:false, type:'magic',
+  {id:'wand',      name:'Gậy Phép',   icon:'🪄', dmg:12, price:400,  owned:false, type:'magic',
    desc:'Tăng nhẹ sát thương phép thuật.', special:'none'},
-  {id:'firewand',  name:'Gậy Lửa',   icon:'🔥', dmg:20, price:75,  owned:false, type:'magic',
+  {id:'firewand',  name:'Gậy Lửa',   icon:'🔥', dmg:20, price:600,  owned:false, type:'magic',
    desc:'<b>Thiêu Đốt</b> — mục tiêu mất 5 HP mỗi lượt (tối đa 3 lượt)!', special:'magicburn'},
-  {id:'thunderwand',name:'Gậy Sét',  icon:'⚡', dmg:35, price:110, owned:false, type:'magic',
+  {id:'thunderwand',name:'Gậy Sét',  icon:'⚡', dmg:35, price:910, owned:false, type:'magic',
    desc:'30% tỉ lệ <b>Choáng</b> — kẻ địch không tấn công được 1 lượt!', special:'stun', stunChance:0.3},
-  {id:'windwand',  name:'Gậy Gió',   icon:'🌪️', dmg:30, price:100, owned:false, type:'magic',
+  {id:'windwand',  name:'Gậy Gió',   icon:'🌪️', dmg:30, price:1100, owned:false, type:'magic',
    desc:'Giảm sát thương địch, 10% tạo <b>Khiên Gió</b> chặn 1 đòn!', special:'windshield', shieldChance:0.1},
   // ══ CAVE REWARDS ══
   {id:'naturewand', name:'Gậy Thiên Nhiên', icon:'🌿', dmg:40, price:0, owned:false, type:'magic', isCaveReward:true, caveChap:0,
@@ -1300,11 +1300,11 @@ let equippedMagic=null;     // equipped magic slot
 
 const armors=[
   {id:'cloth', name:'Áo Vải',    icon:'👕', hp:0,  armor:0,  price:0,   owned:true,  equipped:true,  desc:'Quần áo thường'},
-  {id:'leather',name:'Giáp Da',  icon:'🥋', hp:20, armor:10, price:35,  owned:false, equipped:false, desc:'+20 HP, -10% sát thương'},
-  {id:'chain',  name:'Giáp Lưới',icon:'⛓️', hp:40, armor:20, price:70,  owned:false, equipped:false, desc:'+40 HP, -20% sát thương'},
-  {id:'plate',  name:'Giáp Thép',icon:'🛡️', hp:70, armor:35, price:120, owned:false, equipped:false, desc:'+70 HP, -35% sát thương'},
-  {id:'magic',  name:'Áo Pháp',  icon:'🔮', hp:30, armor:15, price:90,  owned:false, equipped:false, desc:'+30 HP, +30 Mana, giảm mana dùng phép'},
-  {id:'dragon', name:'Giáp Rồng',icon:'🐉', hp:100,armor:50, price:200, owned:false, equipped:false, dragonBonus:0.5, desc:'+100 HP, -50% sát thương, +20 Mana, ⚔+50% DMG với Rồng'},
+  {id:'leather',name:'Giáp Da',  icon:'🥋', hp:30, armor:10, price:350,  owned:false, equipped:false, desc:'+20 HP, -10% sát thương'},
+  {id:'chain',  name:'Giáp Lưới',icon:'⛓️', hp:50, armor:20, price:700,  owned:false, equipped:false, desc:'+40 HP, -20% sát thương'},
+  {id:'plate',  name:'Giáp Thép',icon:'🛡️', hp:80, armor:35, price:1200, owned:false, equipped:false, desc:'+70 HP, -35% sát thương'},
+  {id:'magic',  name:'Áo Pháp',  icon:'🔮', hp:50, armor:15, price:800,  owned:false, equipped:false, desc:'+30 HP, +30 Mana, giảm mana dùng phép'},
+  {id:'dragon', name:'Giáp Rồng',icon:'🐉', hp:200,armor:50, price:2000, owned:false, equipped:false, dragonBonus:0.5, desc:'+100 HP, -50% sát thương, +20 Mana, ⚔+50% DMG với Rồng'},
   // CAVE REWARD
   {id:'angelarmor', name:'Giáp Thiên Thần', icon:'👼', hp:280, armor:45, price:0, owned:false, equipped:false, isCaveReward:true, caveChap:2,
    desc:'🏆 Phần thưởng Bầu Trời! +150 HP, 30-40% <b>Né đòn</b>, 20% <b>Đánh 3 đòn</b>, <b>Hồi Sinh 1 lần</b> khi chết hồi 30% HP+chặn 1 đòn!',
@@ -1326,11 +1326,11 @@ let bNaturePoisonTurns=0;
 // Inventory: potions (consumables)
 let potions={hp:0, mana:0};  // stack count
 const potionDefs=[
-  {id:'hp_sm',  name:'Bình HP Nhỏ', icon:'🧪', restore:30,  type:'hp',   price:15, desc:'Hồi 30 HP'},
-  {id:'hp_lg',  name:'Bình HP Lớn', icon:'❤️', restore:70,  type:'hp',   price:35, desc:'Hồi 70 HP'},
-  {id:'mana_sm',name:'Bình Mana Nhỏ',icon:'💧',restore:25,  type:'mana', price:12, desc:'Hồi 25 Mana'},
-  {id:'mana_lg',name:'Bình Mana Lớn',icon:'💎',restore:60,  type:'mana', price:28, desc:'Hồi 60 Mana'},
-  {id:'full',   name:'Linh Dược',   icon:'✨', restore:999, type:'full',  price:80, desc:'Hồi đầy HP + Mana'},
+  {id:'hp_sm',  name:'Bình HP Nhỏ', icon:'🧪', restore:30,  type:'hp',   price:30, desc:'Hồi 30 HP'},
+  {id:'hp_lg',  name:'Bình HP Lớn', icon:'❤️', restore:70,  type:'hp',   price:55, desc:'Hồi 70 HP'},
+  {id:'mana_sm',name:'Bình Mana Nhỏ',icon:'💧',restore:25,  type:'mana', price:30, desc:'Hồi 25 Mana'},
+  {id:'mana_lg',name:'Bình Mana Lớn',icon:'💎',restore:60,  type:'mana', price:60, desc:'Hồi 60 Mana'},
+  {id:'full',   name:'Linh Dược',   icon:'✨', restore:999, type:'full',  price:100, desc:'Hồi đầy HP + Mana'},
 ];
 
 // Ground platform Y in world coords (= gY in screen when cam.x=0... actually screen gY is fixed, world coords = screen Y for platformer)

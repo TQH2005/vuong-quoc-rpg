@@ -61,14 +61,14 @@
   window.doRegister = async function(){
     const name   = document.getElementById('rg-name')?.value.trim();
     const born   = document.getElementById('rg-born')?.value;
-    const tccode = document.getElementById('rg-tccode')?.value.trim().toUpperCase();
+    const tccode = document.getElementById('rg-class')?.value.trim().toUpperCase();
     const user   = document.getElementById('rg-user')?.value.trim().toLowerCase();
     const pass   = document.getElementById('rg-pass')?.value;
     const pass2  = document.getElementById('rg-pass2')?.value;
     const btn    = document.getElementById('rg-btn');
     clearMsg('lg-reg-err'); clearMsg('lg-reg-ok');
     if(!name)               return setMsg('lg-reg-err','❌ Vui lòng nhập họ và tên!');
-    if(!tccode)             return setMsg('lg-reg-err','❌ Vui lòng nhập mã giáo viên!');
+    // mã lớp không bắt buộc
     if(!user||user.length<3)return setMsg('lg-reg-err','❌ Tên tài khoản tối thiểu 3 ký tự!');
     if(!pass||pass.length<4)return setMsg('lg-reg-err','❌ Mật khẩu tối thiểu 4 ký tự!');
     if(pass!==pass2)        return setMsg('lg-reg-err','❌ Mật khẩu xác nhận không khớp!');

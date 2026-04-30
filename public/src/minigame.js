@@ -206,10 +206,13 @@ function closeMinigame(won){
   // Restore đúng gameState TRƯỚC khi gọi callback
   if(typeof undergroundActive!=='undefined'&&undergroundActive) gameState='UNDERGROUND';
   else gameState='WORLD';
+  // Restart underground loop nếu đang ở underground
+  if(gameState==='UNDERGROUND'&&typeof _startUGLoop==='function'){
+    setTimeout(()=>_startUGLoop(), 60);
+  }
   if(!_mgPendingBoss) return;
   const { onWin, onLose } = _mgPendingBoss;
   _mgPendingBoss = null;
-  // Dùng setTimeout để DOM/state kịp cập nhật trước callback
   setTimeout(()=>{
     if(won && typeof onWin === 'function') onWin();
     else if(!won && typeof onLose === 'function') onLose();

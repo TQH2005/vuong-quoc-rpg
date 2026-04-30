@@ -165,6 +165,9 @@ function renderBagSections(){
   if(ownedMelee.length===0 && ownedMagic.length===0 && ownedArmors.length===0 && totalPots===0){
     sec.innerHTML='<div style="text-align:center;color:#555;font-size:9px;font-family:Times New Roman,serif;padding:20px">Túi đồ trống. Hãy mua đồ từ cửa hàng 🛒</div>';
   }
+
+  // ── Huy hiệu ──
+  if(typeof renderBadgeSection==='function') renderBadgeSection(sec);
 }
 
 

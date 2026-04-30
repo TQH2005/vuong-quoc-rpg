@@ -1,7 +1,3 @@
-function isNightTime(){
-  const td=Math.sin(timeOfDay*Math.PI*2);
-  return td < -0.1;
-}
 function _buildBlockedZones(){
   const zones = [{x1:LAKE_X1-80, x2:LAKE_X2+80}];
   if(typeof houses!=='undefined') houses.forEach(h=>zones.push({x1:h.worldX-60, x2:h.worldX+h.width+60}));
@@ -765,7 +761,6 @@ function renderWorld(){
   });
   
   // Monsters
-  window._nearMon = null;
   monsters.forEach(m=>{
     if(!m.alive)return;
     if(m.nightOnly&&!isNightTime())return; // night-only monsters hidden during day
@@ -946,12 +941,10 @@ function renderWorld(){
     const isNightOnly=m.nightOnly;
     if((isShadowDragon||isNightOnly)&&!isNightTime()) return; // skip night-only during day
     if(dist<80&&gameState==='WORLD'){
-      window._nearMon = m;
       ctx.save();ctx.globalAlpha=0.9;
       ctx.fillStyle=night?'rgba(80,0,0,0.9)':'rgba(0,0,0,0.8)';ctx.fillRect(rx-5,ry-22,m.w+10,12);
       ctx.fillStyle=night?'#ff4444':'#ff8a65';ctx.font='bold 15px "Times New Roman"';ctx.textAlign='center';
       ctx.fillText('[F] TẤN CÔNG',rx+m.w/2,ry-13);ctx.restore();
-      window._nearMon = m;
     }
   });
   
@@ -964,6 +957,27 @@ function renderWorld(){
   const walking=Math.abs(P.vx)>0.3&&P.onGround;
   const frame2=Math.floor(frameCount/7);
   drawKnight(ctx,px2,P.y,P.facing<0,walking,frame2);
+
+  // Badge label trên đầu nhân vật
+  if(typeof getEquippedBadgeLabel==='function'){
+    const _bl=getEquippedBadgeLabel();
+    if(_bl){
+      const _bx=px2+P.w/2, _by=P.y-14;
+      ctx.save();
+      ctx.font='bold 9px "Times New Roman",serif';
+      ctx.textAlign='center';
+      const _bw=ctx.measureText(_bl.icon+' '+_bl.name).width+10;
+      ctx.globalAlpha=0.82;
+      ctx.fillStyle='rgba(0,0,0,0.65)';
+      ctx.beginPath();ctx.roundRect(_bx-_bw/2,_by-11,_bw,13,4);ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.fillStyle=_bl.color;
+      ctx.shadowColor=_bl.color;ctx.shadowBlur=4;
+      ctx.fillText(_bl.icon+' '+_bl.name,_bx,_by);
+      ctx.shadowBlur=0;
+      ctx.restore();
+    }
+  }
   
   // Hurt flash
   if(P.hurtAnim>0){

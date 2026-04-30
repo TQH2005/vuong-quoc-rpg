@@ -56,4 +56,53 @@ router.get('/:user_id', async (req, res) => {
   }
 });
 
+// POST /api/save/class — đặt mã lớp cho user
+router.post('/class', async (req, res) => {
+  const { user_id, class_code } = req.body;
+  if (!user_id || !class_code) return res.status(400).json({ error: 'Thiếu thông tin' });
+  try {
+    await db.query('UPDATE users SET class_code=? WHERE id=?', [class_code.toUpperCase(), user_id]);
+    res.json({ success: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;
+
+// GET /api/ranking?classCode=XXX — bảng xếp hạng lớp
+router.get('/ranking', async (req, res) => {
+  const { classCode } = req.query;
+  if (!classCode) return res.status(400).json({ error: 'Thiếu classCode' });
+  try {
+    const [rows] = await db.query(`
+      SELECT u.id, u.username, u.display_name,
+             gs.level, gs.stats
+      FROM users u
+      LEFT JOIN game_saves gs ON gs.user_id = u.id
+      WHERE u.class_code = ?
+      ORDER BY gs.level DESC, gs.exp DESC
+    `, [classCode.toUpperCase()]);
+
+    const members = rows.map(r => {
+      const stats = JSON.parse(r.stats || '{}');
+      const subjects = stats.subjects || {};
+      // Tính avgPct trung bình tất cả môn
+      let total = 0, count = 0;
+      Object.values(subjects).forEach(s => {
+        if (s.answered > 0) { total += Math.round(s.correct / s.answered * 100); count++; }
+      });
+      return {
+        username:    r.username,
+        displayName: r.display_name || r.username,
+        level:       r.level || 1,
+        avgPct:      count > 0 ? Math.round(total / count) : 0,
+        subjects:    subjects
+      };
+    });
+
+    res.json({ classCode, members });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});

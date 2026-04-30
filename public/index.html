@@ -157,7 +157,7 @@
     <button id="hud-shop-btn" onclick="openShop()" title="Cửa hàng" style="pointer-events:all">🛒</button>
     <button id="hud-bag-btn" onclick="openBag()" title="Túi đồ" style="pointer-events:all;background:linear-gradient(135deg,rgba(255,165,0,0.18),rgba(180,80,0,0.25));border:1px solid #ffa500;border-radius:4px;color:#ffa500;font-size:9px;width:24px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">🎒</button>
     <button id="btn-result" onclick="openProgress()" title="Kết quả học tập" style="pointer-events:all;background:linear-gradient(135deg,rgba(46,204,64,0.15),rgba(0,100,20,0.2));border:1px solid #2ecc40;border-radius:4px;color:#2ecc40;font-size:9px;height:22px;padding:0 5px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;">📊</button>
-    <button id="btn-cmd" onclick="openCheatConsole()" title="Bảng lệnh" style="pointer-events:all;background:rgba(255,255,255,0.05);border:1px solid #555;border-radius:4px;color:#aaa;font-size:9px;height:22px;padding:0 5px;cursor:pointer;-webkit-tap-highlight-color:transparent;">⌨</button>
+    <button id="btn-ranking" onclick="openRanking()" title="Bảng xếp hạng lớp" style="pointer-events:all;background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(180,120,0,0.2));border:1px solid #ffd700;border-radius:4px;color:#ffd700;font-size:9px;height:22px;padding:0 5px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;">🏆 XH</button>
   </div>
   <div id="notif"></div>
   <div class="ans-flash" id="ans-flash"></div>
@@ -515,5 +515,109 @@
 <script src="src/api.js"></script>
 <script src="src/login.js"></script>
 <script src="src/gameLoop.js"></script>
+
+<!-- ── BẢNG XẾP HẠNG LỚP ── -->
+<div id="ranking-overlay" style="display:none;position:fixed;inset:0;z-index:29999;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;">
+  <div style="max-width:520px;width:94%;background:linear-gradient(135deg,#0a0800,#1a1200);border:2px solid #8B6914;border-radius:8px;padding:24px 20px;font-family:'Times New Roman',serif;box-shadow:0 0 40px rgba(255,215,0,0.15);">
+    <div style="text-align:center;font-size:18px;font-weight:900;letter-spacing:3px;color:#ffd700;margin-bottom:4px;">🏆 BẢNG XẾP HẠNG</div>
+    <div style="text-align:center;font-size:11px;color:#7a5820;margin-bottom:16px;">Nhập mã lớp để xem kết quả của lớp bạn</div>
+    <!-- Nhập mã lớp -->
+    <div id="rk-input-section">
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input id="rk-code-inp" type="text" placeholder="Nhập mã lớp (VD: TOAN7A)..." autocomplete="off" spellcheck="false"
+          style="flex:1;background:rgba(0,0,0,0.4);border:1px solid #4a3010;border-radius:4px;color:#e8d5a3;font-size:12px;padding:8px 10px;font-family:'Times New Roman',serif;outline:none;"/>
+        <button onclick="doRankingLookup()" style="padding:8px 14px;background:linear-gradient(135deg,#4a2800,#8B4500);border:1px solid #ffd700;border-radius:4px;color:#ffd700;font-size:12px;cursor:pointer;font-family:'Times New Roman',serif;white-space:nowrap;">🔍 Tra</button>
+      </div>
+      <div id="rk-err" style="display:none;color:#e74c3c;font-size:11px;text-align:center;margin-bottom:8px;">❌ Không tìm thấy mã lớp!</div>
+    </div>
+    <!-- Danh sách xếp hạng -->
+    <div id="rk-list" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div id="rk-class-name" style="font-size:13px;color:#ffd700;font-weight:700;"></div>
+        <div style="font-size:10px;color:#7a5820;cursor:pointer;" onclick="document.getElementById('rk-list').style.display='none';document.getElementById('rk-input-section').style.display='';">↩ Đổi lớp</div>
+      </div>
+      <div id="rk-rows" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;"></div>
+    </div>
+    <!-- Loading -->
+    <div id="rk-loading" style="display:none;text-align:center;color:#7a5820;font-size:13px;padding:20px;">⏳ Đang tải...</div>
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="closeRanking()" style="padding:8px 24px;background:rgba(0,0,0,0.4);border:1px solid #4a3010;border-radius:4px;color:#7a5820;font-size:12px;cursor:pointer;font-family:'Times New Roman',serif;">✕ Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Bảng xếp hạng lớp ────────────────────────
+function openRanking(){
+  document.getElementById('ranking-overlay').style.display='flex';
+  document.getElementById('rk-err').style.display='none';
+  document.getElementById('rk-list').style.display='none';
+  document.getElementById('rk-loading').style.display='none';
+  document.getElementById('rk-input-section').style.display='';
+}
+function closeRanking(){
+  document.getElementById('ranking-overlay').style.display='none';
+}
+document.getElementById('rk-code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')doRankingLookup();});
+
+const SUBJ_NAMES_RK={math:'Toán',geo:'Địa',history:'Sử',literature:'Văn',civic:'GDCD',english:'Anh'};
+const SUBJ_ICONS_RK={math:'📐',geo:'🌍',history:'📜',literature:'📖',civic:'⚖️',english:'🔤'};
+
+function getRankLabel(pct){
+  if(pct>=80) return {label:'Giỏi',color:'#2ecc40'};
+  if(pct>=65) return {label:'Khá',color:'#3498db'};
+  if(pct>=50) return {label:'TB',color:'#e67e22'};
+  return {label:'Yếu',color:'#e74c3c'};
+}
+
+async function doRankingLookup(){
+  const code = document.getElementById('rk-code-inp').value.trim().toUpperCase();
+  if(!code) return;
+  const err = document.getElementById('rk-err');
+  const list = document.getElementById('rk-list');
+  const loading = document.getElementById('rk-loading');
+  err.style.display='none'; list.style.display='none';
+  loading.style.display='block';
+  try {
+    const res = await fetch('/api/ranking?classCode='+encodeURIComponent(code));
+    if(!res.ok) throw new Error('not found');
+    const data = await res.json();
+    if(!data||!data.members||data.members.length===0) throw new Error('empty');
+    loading.style.display='none';
+    document.getElementById('rk-class-name').textContent='🏫 Lớp: '+code+' ('+data.members.length+' học sinh)';
+    const rows = document.getElementById('rk-rows');
+    rows.innerHTML='';
+    // Sắp xếp theo avgPct giảm dần
+    data.members.sort((a,b)=>(b.avgPct||0)-(a.avgPct||0));
+    data.members.forEach((m,i)=>{
+      const rank=i+1;
+      const pct=m.avgPct||0;
+      const rl=getRankLabel(pct);
+      const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.3);border:1px solid #2a1a00;border-radius:6px;padding:8px 12px;';
+      row.innerHTML=`
+        <div style="font-size:16px;width:28px;text-align:center;">${medal}</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;color:#e8d5a3;font-weight:700;">${m.displayName||m.username}</div>
+          <div style="font-size:10px;color:#7a5820;">@${m.username} &nbsp;·&nbsp; Lv${m.level||1}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+          ${Object.entries(SUBJ_NAMES_RK).map(([k,n])=>{
+            const sp=m.subjects&&m.subjects[k]?Math.round((m.subjects[k].correct||0)/(m.subjects[k].answered||1)*100):0;
+            const sl=getRankLabel(sp);
+            return \`<div style="font-size:9px;color:\${sl.color};background:rgba(0,0,0,0.3);border:1px solid \${sl.color}44;border-radius:3px;padding:2px 5px;">\${SUBJ_ICONS_RK[k]}\${sp}%</div>\`;
+          }).join('')}
+        </div>
+        <div style="font-size:13px;font-weight:700;color:\${rl.color};min-width:36px;text-align:right;">\${pct}%</div>`;
+      rows.appendChild(row);
+    });
+    list.style.display='block';
+  } catch(e){
+    loading.style.display='none';
+    err.style.display='block';
+  }
+}
+</script>
 </body>
 </html>

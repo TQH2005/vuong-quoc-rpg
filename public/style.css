@@ -1703,3 +1703,10 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 }
 #minigame-flee:hover{background:rgba(180,0,0,0.7);}
 #mg-chess-wrap,#mg-caro-wrap,#mg-cipher-wrap{width:100%;height:100%;}
+#btn-ranking{
+  pointer-events:all;
+  height:30px;padding:0 10px;
+  font-size:13px;letter-spacing:1px;
+}
+#btn-cmd{display:none!important;}
+#hp-txt,#mp-txt{font-size:11px!important;}

@@ -29,7 +29,7 @@ router.get('/:classId/leaderboard', async (req, res) => {
         AND g.updated_at = (
           SELECT MAX(g2.updated_at) FROM game_saves g2 WHERE g2.user_id = u.id
         )
-      WHERE u.class_id = ?
+      WHERE u.teacher_code = ?
         AND u.role = 'student'
       ORDER BY COALESCE(g.exp, 0) DESC, COALESCE(g.level, 1) DESC
     `, [classId]);
@@ -47,6 +47,7 @@ router.get('/:classId/leaderboard', async (req, res) => {
       lastSave   : r.updated_at
     }));
 
+    if(!students.length) return res.status(404).json({ error: 'Không tìm thấy lớp: '+classId });
     res.json({ success: true, classId, students });
   } catch(e) {
     res.status(500).json({ error: e.message });

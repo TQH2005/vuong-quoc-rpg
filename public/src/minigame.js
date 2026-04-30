@@ -116,7 +116,10 @@ function _tryAdvanceOceanFloor(){
             _orig(); // advance thật — vào tầng 10
             showNotif('🔥 Cổng địa ngục mở! HỎA LONG VƯƠNG đang chờ!');
           },
-          () => showNotif('🔐 Sai mật mã... Hỏa Long cười lửa.')
+          () => {
+            showNotif('🔐 Bỏ cuộc... Nhân vật trở về mặt đất!');
+            if(typeof exitUnderground==='function') exitUnderground();
+          }
         )
       );
       return;

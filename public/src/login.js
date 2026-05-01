@@ -333,9 +333,9 @@
     });
     // Dừng game loop
     if(typeof window._stopGameLoop==='function') window._stopGameLoop();
-    // Ẩn game
-    const wrap=document.getElementById('gc');
-    if(wrap){ wrap.style.visibility='hidden'; wrap.style.pointerEvents='none'; }
+    // Ẩn game (wrap = #wrap, không phải #gc)
+    const _wrap = document.getElementById('wrap') || document.getElementById('gc');
+    if(_wrap){ _wrap.style.visibility='hidden'; _wrap.style.pointerEvents='none'; }
     // Hiện login
     const ls=document.getElementById('login-screen');
     if(ls) ls.classList.remove('off');

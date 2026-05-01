@@ -223,34 +223,41 @@
   <!-- BAG OVERLAY -->
   <div id="bag-overlay">
     <div id="bag-title">🎒 TÚI ĐỒ</div>
-    <div id="bag-stats">
-      ❤️ <span id="bag-hp">100</span> &nbsp;|&nbsp;
-      💧 <span id="bag-mp">80</span> &nbsp;|&nbsp;
-      🪙 <span id="bag-coins">0</span> xu &nbsp;|&nbsp;
-      ★ <span id="bag-lv">Lv1</span>
+    <div id="bag-inner-wrap">
+      <!-- CỘT TRÁI -->
+      <div id="bag-left">
+        <div id="bag-stats">
+          ❤️ <span id="bag-hp">100</span>
+          💧 <span id="bag-mp">80</span>
+          🪙 <span id="bag-coins">0</span> xu
+          ★ <span id="bag-lv">Lv1</span>
+        </div>
+        <div id="bag-equip-bar">
+          <div class="equip-bar-label">ĐANG DÙNG:</div>
+          <div class="equip-slot">
+            <div class="equip-slot-label">⚔ CẬN CHIẾN</div>
+            <div class="equip-slot-item" id="bag-eq-melee">—</div>
+          </div>
+          <div class="equip-slot">
+            <div class="equip-slot-label">✨ PHÉP THUẬT</div>
+            <div class="equip-slot-item" id="bag-eq-magic" style="color:#cc88ff">—</div>
+          </div>
+          <div class="equip-slot">
+            <div class="equip-slot-label">🛡 GIÁP</div>
+            <div class="equip-slot-item" id="bag-eq-armor">—</div>
+          </div>
+          <div class="equip-slot">
+            <div class="equip-slot-label">🧪 BÌNH</div>
+            <div class="equip-slot-item" id="bag-eq-pots">—</div>
+          </div>
+        </div>
+        <button id="bag-close" onclick="closeBag()">✕ ĐÓNG</button>
+      </div>
+      <!-- CỘT PHẢI -->
+      <div id="bag-right">
+        <div id="bag-sections"></div>
+      </div>
     </div>
-    <!-- Equipped bar -->
-    <div id="bag-equip-bar">
-      <div style="font-size:8px;color:#888;font-family:'Times New Roman',serif;letter-spacing:1px;margin-right:4px;">ĐANG DÙNG:</div>
-      <div class="equip-slot">
-        <div class="equip-slot-label">⚔ CẬN</div>
-        <div class="equip-slot-item" id="bag-eq-melee">—</div>
-      </div>
-      <div class="equip-slot">
-        <div class="equip-slot-label">✨ PHÉP</div>
-        <div class="equip-slot-item" id="bag-eq-magic" style="color:#cc88ff">—</div>
-      </div>
-      <div class="equip-slot">
-        <div class="equip-slot-label">🛡 GIÁP</div>
-        <div class="equip-slot-item" id="bag-eq-armor">—</div>
-      </div>
-      <div class="equip-slot" style="flex:1">
-        <div class="equip-slot-label">🧪 BÌNH</div>
-        <div class="equip-slot-item" id="bag-eq-pots">—</div>
-      </div>
-    </div>
-    <div id="bag-sections"></div>
-    <button id="bag-close" onclick="closeBag()">✕ ĐÓNG</button>
   </div>
 
   <!-- SHOP — fullscreen overlay ngoài canvas -->

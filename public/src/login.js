@@ -290,6 +290,8 @@
     document.getElementById('login-screen').classList.add('off');
     wrap.style.visibility   = 'visible';
     wrap.style.pointerEvents = '';
+    // Resume game loop
+    if(typeof _gameRunning !== 'undefined') window._gameRunning = true;
     window._loginCooldown = true;
     setTimeout(()=>{ window._loginCooldown=false; }, 1500);
     if(typeof updateHUD==='function') updateHUD();
@@ -315,6 +317,8 @@
       const el=document.getElementById(id);
       if(el){ el.textContent=''; el.style.display='none'; }
     });
+    // Pause game loop
+    if(typeof _gameRunning !== 'undefined') window._gameRunning = false;
     // Ẩn game
     const wrap=document.getElementById('gc');
     if(wrap){ wrap.style.visibility='hidden'; wrap.style.pointerEvents='none'; }

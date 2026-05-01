@@ -1,5 +1,7 @@
+let _gameRunning = true;
 
 function loop(){
+  if(!_gameRunning){ requestAnimationFrame(loop); return; }
   frameCount++;
   if(inOcean){ updateOcean(); }
   else { updatePhysics(); updateLakeSplashes(); }

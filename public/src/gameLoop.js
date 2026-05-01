@@ -1,7 +1,9 @@
 let _gameRunning = true;
+let _rafId = null;
 
 function loop(){
-  if(!_gameRunning){ requestAnimationFrame(loop); return; }
+  _rafId = requestAnimationFrame(loop);
+  if(!_gameRunning) return;
   frameCount++;
   if(inOcean){ updateOcean(); }
   else { updatePhysics(); updateLakeSplashes(); }
@@ -13,15 +15,17 @@ function loop(){
   if((gameState==='INDOOR'||(gameState==='DIALOG'&&currentHouse))&&currentHouse){
     renderIndoor(currentHouse);
   }
-  // Redraw battle ambient every frame
   if(gameState==='BATTLE'){
     drawBattleScene(0,0);
   }
   syncVControls();
-  requestAnimationFrame(loop);
 }
 updateHUD();
 loop();
+
+// Expose để login.js dùng
+window._stopGameLoop  = ()=>{ if(_rafId){ cancelAnimationFrame(_rafId); _rafId=null; } };
+window._startGameLoop = ()=>{ if(!_rafId) loop(); };
 
 // ═══════════════════════════════════════════
 // RESPONSIVE CANVAS SCALING

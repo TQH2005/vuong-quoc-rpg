@@ -303,8 +303,9 @@
       const el=document.getElementById(id);
       if(el) el.classList.remove('on');
     });
-    // Resume game loop
-    window._gameRunning = true;
+    // Khởi động lại game loop
+    if(typeof window._startGameLoop==='function') window._startGameLoop();
+    else window._gameRunning = true;
     window._loginCooldown = true;
     setTimeout(()=>{ window._loginCooldown=false; }, 1500);
     if(typeof updateHUD==='function') updateHUD();
@@ -330,8 +331,8 @@
       const el=document.getElementById(id);
       if(el){ el.textContent=''; el.style.display='none'; }
     });
-    // Pause game loop
-    if(typeof _gameRunning !== 'undefined') window._gameRunning = false;
+    // Dừng game loop
+    if(typeof window._stopGameLoop==='function') window._stopGameLoop();
     // Ẩn game
     const wrap=document.getElementById('gc');
     if(wrap){ wrap.style.visibility='hidden'; wrap.style.pointerEvents='none'; }

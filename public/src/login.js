@@ -290,8 +290,21 @@
     document.getElementById('login-screen').classList.add('off');
     wrap.style.visibility   = 'visible';
     wrap.style.pointerEvents = '';
+    // Reset game state về WORLD
+    if(typeof gameState !== 'undefined') gameState = 'WORLD';
+    if(typeof inOcean   !== 'undefined') inOcean   = false;
+    if(typeof undergroundActive !== 'undefined') undergroundActive = false;
+    if(typeof currentHouse !== 'undefined') currentHouse = null;
+    // Reset camera
+    if(typeof cam !== 'undefined') cam.x = P ? Math.max(0, P.x - GW/2) : 0;
+    // Đóng tất cả overlay còn mở
+    ['battle','shop','bag-overlay','dialog','puzzle','cave-overlay',
+     'level-start','indoor-wrap','minigame-overlay'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.classList.remove('on');
+    });
     // Resume game loop
-    if(typeof _gameRunning !== 'undefined') window._gameRunning = true;
+    window._gameRunning = true;
     window._loginCooldown = true;
     setTimeout(()=>{ window._loginCooldown=false; }, 1500);
     if(typeof updateHUD==='function') updateHUD();

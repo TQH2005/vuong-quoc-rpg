@@ -297,28 +297,31 @@
     window.addEventListener('beforeunload', ()=>{ window.saveGameData(); });
   }
 
-  // ══════════════════════════════════════════
-  // ĐĂNG XUẤT
-  // ══════════════════════════════════════════
+  // ── ĐĂNG XUẤT ───────────────────────────────────────────
   window.doLogout = async function(){
-    // Lưu game trước khi thoát
     await window.saveGameData();
-    // Reset state
     window._currentUserId = null;
     window._currentUser   = null;
-    // Ẩn game, hiện login
-    const wrap = document.getElementById('gc');
-    if(wrap){ wrap.style.visibility='hidden'; wrap.style.pointerEvents='none'; }
-    const ls = document.getElementById('login-screen');
-    if(ls){ ls.classList.remove('off'); }
-    // Reset tab về đăng nhập
-    if(typeof switchTab==='function') switchTab('login');
+    window._loginCooldown = false;
+    // Reset nút về trạng thái ban đầu
+    const btn = document.getElementById('lg-btn');
+    if(btn){ btn.disabled=false; btn.textContent='⚔️ VÀO GAME'; }
     // Xóa input
     ['lg-user','lg-pass'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el) el.value='';
+      const el=document.getElementById(id); if(el) el.value='';
     });
-    if(typeof showNotif==='function') showNotif('👋 Đã đăng xuất!');
+    // Xóa lỗi cũ
+    ['lg-err','lg-reg-err'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){ el.textContent=''; el.style.display='none'; }
+    });
+    // Ẩn game
+    const wrap=document.getElementById('gc');
+    if(wrap){ wrap.style.visibility='hidden'; wrap.style.pointerEvents='none'; }
+    // Hiện login
+    const ls=document.getElementById('login-screen');
+    if(ls) ls.classList.remove('off');
+    if(typeof switchTab==='function') switchTab('login');
   };
 
   // ══════════════════════════════════════════

@@ -50,8 +50,6 @@
       return;
     }
     btn.textContent='✅ ĐANG VÀO...';
-    // Lưu teacher_code để bảng xếp hạng dùng
-    window._currentTeacherCode = res.teacher_code || '';
     setTimeout(()=>enterGame(res.user_id, user, res.displayName), 500);
   };
 
@@ -61,14 +59,14 @@
   window.doRegister = async function(){
     const name   = document.getElementById('rg-name')?.value.trim();
     const born   = document.getElementById('rg-born')?.value;
-    const tccode = document.getElementById('rg-class')?.value.trim().toUpperCase();
+    const tccode = document.getElementById('rg-tccode')?.value.trim().toUpperCase();
     const user   = document.getElementById('rg-user')?.value.trim().toLowerCase();
     const pass   = document.getElementById('rg-pass')?.value;
     const pass2  = document.getElementById('rg-pass2')?.value;
     const btn    = document.getElementById('rg-btn');
     clearMsg('lg-reg-err'); clearMsg('lg-reg-ok');
     if(!name)               return setMsg('lg-reg-err','❌ Vui lòng nhập họ và tên!');
-    // mã lớp không bắt buộc
+    if(!tccode)             return setMsg('lg-reg-err','❌ Vui lòng nhập mã giáo viên!');
     if(!user||user.length<3)return setMsg('lg-reg-err','❌ Tên tài khoản tối thiểu 3 ký tự!');
     if(!pass||pass.length<4)return setMsg('lg-reg-err','❌ Mật khẩu tối thiểu 4 ký tự!');
     if(pass!==pass2)        return setMsg('lg-reg-err','❌ Mật khẩu xác nhận không khớp!');
@@ -80,7 +78,6 @@
       return;
     }
     setMsg('lg-reg-ok','✅ Đăng ký thành công! Đang vào game...', true);
-    window._currentTeacherCode = tccode || '';
     setTimeout(()=>enterGame(res.user_id, user, name), 800);
   };
 
@@ -286,61 +283,21 @@
   async function enterGame(userId, username, displayName){
     window._currentUser   = username;
     window._currentUserId = userId;
-    await window.loadGameData(userId);
+    // Hiện game trước, load data sau để đảm bảo weapons/armors đã init
     document.getElementById('login-screen').classList.add('off');
     wrap.style.visibility   = 'visible';
     wrap.style.pointerEvents = '';
-    // Reset game state về WORLD
-    if(typeof gameState !== 'undefined') gameState = 'WORLD';
-    if(typeof inOcean   !== 'undefined') inOcean   = false;
-    if(typeof undergroundActive !== 'undefined') undergroundActive = false;
-    if(typeof currentHouse !== 'undefined') currentHouse = null;
-    // Reset camera
-    if(typeof cam !== 'undefined') cam.x = P ? Math.max(0, P.x - GW/2) : 0;
-    // Đóng tất cả overlay còn mở
-    ['battle','shop','bag-overlay','dialog','puzzle','cave-overlay',
-     'level-start','indoor-wrap','minigame-overlay'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el) el.classList.remove('on');
-    });
-    // Khởi động lại game loop
-    if(typeof window._startGameLoop==='function') window._startGameLoop();
-    else window._gameRunning = true;
     window._loginCooldown = true;
     setTimeout(()=>{ window._loginCooldown=false; }, 1500);
-    if(typeof updateHUD==='function') updateHUD();
-    setTimeout(()=>{ if(typeof showNotif==='function') showNotif('⚔️ Chào mừng, '+displayName+'!'); }, 300);
+    // Delay 500ms để game loop và shop/bag khởi tạo xong
+    setTimeout(async ()=>{
+      const loaded = await window.loadGameData(userId);
+      if(typeof updateHUD==='function') updateHUD();
+      const msg = loaded ? '⚔️ Chào mừng trở lại, '+displayName+'!' : '⚔️ Chào mừng, '+displayName+'!';
+      if(typeof showNotif==='function') showNotif(msg);
+    }, 500);
     window.addEventListener('beforeunload', ()=>{ window.saveGameData(); });
   }
-
-  // ── ĐĂNG XUẤT ───────────────────────────────────────────
-  window.doLogout = async function(){
-    await window.saveGameData();
-    window._currentUserId = null;
-    window._currentUser   = null;
-    window._loginCooldown = false;
-    // Reset nút về trạng thái ban đầu
-    const btn = document.getElementById('lg-btn');
-    if(btn){ btn.disabled=false; btn.textContent='⚔️ VÀO GAME'; }
-    // Xóa input
-    ['lg-user','lg-pass'].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.value='';
-    });
-    // Xóa lỗi cũ
-    ['lg-err','lg-reg-err'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el){ el.textContent=''; el.style.display='none'; }
-    });
-    // Dừng game loop
-    if(typeof window._stopGameLoop==='function') window._stopGameLoop();
-    // Ẩn game (wrap = #wrap, không phải #gc)
-    const _wrap = document.getElementById('wrap') || document.getElementById('gc');
-    if(_wrap){ _wrap.style.visibility='hidden'; _wrap.style.pointerEvents='none'; }
-    // Hiện login
-    const ls=document.getElementById('login-screen');
-    if(ls) ls.classList.remove('off');
-    if(typeof switchTab==='function') switchTab('login');
-  };
 
   // ══════════════════════════════════════════
   // SAVE / LOAD
@@ -362,8 +319,12 @@
       flags:{
         hacLongUnlocked: typeof hacLongUnlocked!=='undefined'?hacLongUnlocked:false,
         thuLongUnlocked: typeof thuLongUnlocked!=='undefined'?thuLongUnlocked:false,
-        inOcean:         typeof inOcean        !=='undefined'?inOcean:false,
+        hoaLongUnlocked: typeof hoaLongUnlocked!=='undefined'?hoaLongUnlocked:false,
+        oceanFloor:      typeof oceanFloor     !=='undefined'?oceanFloor:1,
+        undergroundFloor:typeof undergroundFloor!=='undefined'?undergroundFloor:1,
       },
+      pos_x: typeof P!=='undefined'?P.x:0,
+      pos_y: typeof P!=='undefined'?P.y:0,
       stats: typeof learnStats!=='undefined'?learnStats:{}
     };
   }
@@ -391,12 +352,28 @@
       const fl=gd.flags||{};
       if(typeof hacLongUnlocked!=='undefined') hacLongUnlocked=fl.hacLongUnlocked||false;
       if(typeof thuLongUnlocked!=='undefined') thuLongUnlocked=fl.thuLongUnlocked||false;
+      if(typeof hoaLongUnlocked!=='undefined') hoaLongUnlocked=fl.hoaLongUnlocked||false;
+      if(typeof oceanFloor     !=='undefined'&&fl.oceanFloor>1) oceanFloor=fl.oceanFloor;
+      if(typeof undergroundFloor!=='undefined'&&fl.undergroundFloor>1) undergroundFloor=fl.undergroundFloor;
       if(gd.stats&&typeof learnStats!=='undefined') Object.assign(learnStats,gd.stats);
+      // Cập nhật MaxHP/MaxMana theo level
+      if(typeof playerLevel!=='undefined'&&typeof playerMaxHP!=='undefined'){
+        playerMaxHP  = 100 + (playerLevel-1)*20;
+        playerMaxMana= 80  + (playerLevel-1)*10;
+        // Giới hạn HP hiện tại không vượt max
+        if(typeof playerHP!=='undefined') playerHP=Math.min(playerHP,playerMaxHP);
+      }
+      if(typeof updateHUD==='function') updateHUD();
+      console.log('✅ Game loaded: Lv'+playerLevel+' | '+coins+'xu | HP:'+playerHP);
       return true;
-    } catch(e){ return false; }
+    } catch(e){ console.error('loadGameData error:',e); return false; }
   };
 
-  setInterval(()=>{ window.saveGameData(); }, 30000);
+  setInterval(()=>{ window.saveGameData(); }, 60000);
+  // Save khi người dùng chuyển tab hoặc thu nhỏ cửa sổ
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState==='hidden') window.saveGameData();
+  });
 
   // Patch API.register để nhận teacher_code
   window.API = window.API || {};

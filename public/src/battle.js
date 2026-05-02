@@ -144,11 +144,6 @@ function showBattleQuiz(attackType){
   });
 }
 function startBattle(m){
-  // Hide ocean/underground exit buttons during battle
-  ['ocean-exit-btn','indoor-exit-btn'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display='none';
-  });
   // Shadow dragon only available at night
   if(m.type==='dragon_shadow'&&!isNightTime()){
     showNotif('🌑 Ám Long chỉ xuất hiện ban đêm!'); return;
@@ -907,11 +902,6 @@ function triggerHacLongPhase2(){
 }
 
 function endBattle(won,rw){
-  // Restore exit buttons
-  ['ocean-exit-btn','indoor-exit-btn'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display='';
-  });
   stopDragonFXLoop();
   bActive=false;
   FX.stop();
@@ -997,7 +987,9 @@ function endBattle(won,rw){
   const diffMult=[0,1.05,1.15,1.30,1.60,2.20][battleDiff]||1;
   const finalRw=won?Math.round(totalRw*diffMult):0;
   if(won){
-    coins+=finalRw;if(bMon){bMon.alive=false;bMon.deathTime=Date.now();}updateHUD();
+    coins+=finalRw;
+    // Auto-save khi thắng battle
+    setTimeout(()=>{ if(typeof window.saveGameData==='function') window.saveGameData(); }, 1000);if(bMon){bMon.alive=false;bMon.deathTime=Date.now();}updateHUD();
     const bonusTxt=nightBonus>0?' (+🌑'+nightBonus+' thưởng đêm)':'';
     const diffLabel=battleDiff>1?' 📚×'+[0,'','1.15','1.30','1.60','2.20'][battleDiff]:'';
     setBLog('🏆 THẮNG! +'+finalRw+' 🪙'+bonusTxt+diffLabel);

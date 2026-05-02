@@ -1,3 +1,176 @@
+function renderBagSections(){
+  const sec=document.getElementById('bag-sections');
+  sec.innerHTML='';
+
+  // ── Section 1: Vũ Khí Cận Chiến ──
+  const ownedMelee=weapons.filter(w=>w.owned&&w.type==='melee');
+  if(ownedMelee.length>0){
+    const s=document.createElement('div');s.className='bag-section';
+    s.innerHTML='<div class="bag-section-title">⚔ Cận Chiến ('+ownedMelee.length+') <span style="font-size:7px;color:#666">— nhấn để trang bị vào ô ⚔</span></div>';
+    const g=document.createElement('div');g.className='bag-grid';
+    ownedMelee.forEach(w=>{
+      const isEq=equippedMelee&&equippedMelee.id===w.id;
+      const isCave=w.isCaveReward;
+      const slot=document.createElement('div');
+      slot.className='bag-slot'+(isEq?' equipped':'');
+      if(isCave) slot.style.borderColor='rgba(255,215,0,0.6)';
+      const descClean=(w.desc||'').replace(/<[^>]+>/g,'');
+      slot.innerHTML=`
+        <div class="bag-slot-icon">${w.icon}</div>
+        <div class="bag-slot-name">${w.name}</div>
+        <div class="bag-slot-stat" style="color:#ffd700">⚔${w.dmg}</div>
+        <div class="bag-slot-tip">
+          <b style="color:#ffd700">${w.icon} ${w.name}</b><br>
+          Sát thương: ${w.dmg} DMG<br>
+          ${descClean}<br>
+          <span style="color:#aaa">${isEq?'✓ Đang trang bị':'Nhấn để trang bị ô ⚔'}</span>
+        </div>`;
+      slot.onclick=()=>{
+        equippedMelee=w; equippedWpn=w;
+        updateHUD(); showNotif(w.icon+' Trang bị CẬN: '+w.name);
+        renderBagSections(); refreshBagEquipBar();
+      };
+      g.appendChild(slot);
+    });
+    const empties=Math.max(0,5-ownedMelee.length);
+    for(let i=0;i<empties;i++){const e=document.createElement('div');e.className='bag-slot empty';g.appendChild(e);}
+    s.appendChild(g);sec.appendChild(s);
+  }
+
+  // ── Section 2: Vũ Khí Phép ──
+  const ownedMagic=weapons.filter(w=>w.owned&&w.type==='magic');
+  if(ownedMagic.length>0){
+    const s=document.createElement('div');s.className='bag-section';
+    s.innerHTML='<div class="bag-section-title">✨ Phép Thuật ('+ownedMagic.length+') <span style="font-size:7px;color:#666">— nhấn để trang bị vào ô ✨</span></div>';
+    const g=document.createElement('div');g.className='bag-grid';
+    ownedMagic.forEach(w=>{
+      const isEq=equippedMagic&&equippedMagic.id===w.id;
+      const isCave=w.isCaveReward;
+      const slot=document.createElement('div');
+      slot.className='bag-slot'+(isEq?' equipped':'');
+      if(isCave) slot.style.borderColor='rgba(200,136,255,0.6)';
+      if(isEq) slot.style.boxShadow='0 0 8px rgba(200,136,255,0.4)';
+      const descClean=(w.desc||'').replace(/<[^>]+>/g,'');
+      slot.innerHTML=`
+        <div class="bag-slot-icon">${w.icon}</div>
+        <div class="bag-slot-name">${w.name}</div>
+        <div class="bag-slot-stat" style="color:#cc88ff">✨${w.dmg}</div>
+        <div class="bag-slot-tip">
+          <b style="color:#cc88ff">${w.icon} ${w.name}</b><br>
+          Sát thương: ${w.dmg} DMG<br>
+          ${descClean}<br>
+          <span style="color:#aaa">${isEq?'✓ Đang trang bị':'Nhấn để trang bị ô ✨'}</span>
+        </div>`;
+      slot.onclick=()=>{
+        equippedMagic=w;
+        updateHUD(); showNotif(w.icon+' Trang bị PHÉP: '+w.name);
+        renderBagSections(); refreshBagEquipBar();
+      };
+      g.appendChild(slot);
+    });
+    const empties=Math.max(0,5-ownedMagic.length);
+    for(let i=0;i<empties;i++){const e=document.createElement('div');e.className='bag-slot empty';g.appendChild(e);}
+    s.appendChild(g);sec.appendChild(s);
+  }
+
+  // ── Section 3: Giáp ──
+  const ownedArmors=armors.filter(a=>a.owned);
+  if(ownedArmors.length>0){
+    const s=document.createElement('div');s.className='bag-section';
+    s.innerHTML='<div class="bag-section-title">🛡 Giáp ('+ownedArmors.length+')</div>';
+    const g=document.createElement('div');g.className='bag-grid';
+    ownedArmors.forEach(a=>{
+      const isEq=equippedArmor&&equippedArmor.id===a.id;
+      const slot=document.createElement('div');
+      slot.className='bag-slot'+(isEq?' equipped':'');
+      slot.innerHTML=`
+        <div class="bag-slot-icon">${a.icon}</div>
+        <div class="bag-slot-name">${a.name}</div>
+        <div class="bag-slot-stat" style="color:#2196f3">🛡${a.armor}%</div>
+        <div class="bag-slot-tip">
+          <b style="color:#ffd700">${a.icon} ${a.name}</b><br>
+          Giáp: -${a.armor}% sát thương<br>
+          HP: +${a.hp}<br>
+          ${a.desc}<br>
+          <span style="color:#aaa">${isEq?'✓ Đang mặc':'Nhấn để mặc'}</span>
+        </div>`;
+      slot.onclick=()=>{
+        if(!isEq){
+          const prev=equippedArmor;
+          playerMaxHP=Math.max(100,100+a.hp);
+          playerHP=Math.min(playerHP,playerMaxHP);
+          if(a.id==='magic'||a.id==='dragon'){playerMaxMana=80+(a.id==='magic'?30:20);}
+          else playerMaxMana=80;
+          playerMana=Math.min(playerMana,playerMaxMana);
+          equippedArmor=a;
+          armors.forEach(x=>x.equipped=false); a.equipped=true;
+          updateHUD();showNotif('🛡️ Mặc: '+a.name);
+          renderBagSections();
+          document.getElementById('bag-eq-armor').textContent=a.icon+' '+a.name;
+        }
+      };
+      g.appendChild(slot);
+    });
+    const empties=Math.max(0, 5-ownedArmors.length);
+    for(let i=0;i<empties;i++){
+      const e=document.createElement('div');e.className='bag-slot empty';g.appendChild(e);
+    }
+    s.appendChild(g);sec.appendChild(s);
+  }
+
+  // ── Section 3: Bình ──
+  const totalPots=potions.hp+potions.mana;
+  const s3=document.createElement('div');s3.className='bag-section';
+  s3.innerHTML='<div class="bag-section-title">🧪 Bình ('+totalPots+')</div>';
+  const g3=document.createElement('div');g3.className='bag-grid';
+  // HP Potion — 1 slot với số lượng
+  {
+    const slot=document.createElement('div');
+    slot.className='bag-slot'+(potions.hp>0?'':' empty');
+    if(potions.hp>0){
+      slot.innerHTML=`
+        <div class="bag-slot-icon">🧪</div>
+        <div class="bag-slot-name">Máu</div>
+        <div class="bag-slot-stat" style="color:#e74c3c">+50❤</div>
+        <div class="bag-slot-qty">×${potions.hp}</div>
+        <div class="bag-slot-tip"><b style="color:#ffd700">🧪 Bình Máu</b><br>Hồi 50 HP<br>Số lượng: ${potions.hp}<br><span style="color:#aaa">Dùng trong chiến đấu</span></div>`;
+    } else {
+      slot.innerHTML=`<div class="bag-slot-icon" style="opacity:0.3">🧪</div><div class="bag-slot-name" style="opacity:0.3">Máu</div><div class="bag-slot-stat" style="color:#555">0</div>`;
+    }
+    g3.appendChild(slot);
+  }
+  // Mana Potion — 1 slot với số lượng
+  {
+    const slot=document.createElement('div');
+    slot.className='bag-slot'+(potions.mana>0?'':' empty');
+    if(potions.mana>0){
+      slot.innerHTML=`
+        <div class="bag-slot-icon">💧</div>
+        <div class="bag-slot-name">Mana</div>
+        <div class="bag-slot-stat" style="color:#2196f3">+40💧</div>
+        <div class="bag-slot-qty">×${potions.mana}</div>
+        <div class="bag-slot-tip"><b style="color:#ffd700">💧 Bình Mana</b><br>Hồi 40 Mana<br>Số lượng: ${potions.mana}<br><span style="color:#aaa">Dùng trong chiến đấu</span></div>`;
+    } else {
+      slot.innerHTML=`<div class="bag-slot-icon" style="opacity:0.3">💧</div><div class="bag-slot-name" style="opacity:0.3">Mana</div><div class="bag-slot-stat" style="color:#555">0</div>`;
+    }
+    g3.appendChild(slot);
+  }
+  if(totalPots===0){
+    const e=document.createElement('div');e.className='bag-slot empty';
+    g3.appendChild(e);
+  }
+  s3.appendChild(g3);sec.appendChild(s3);
+
+  // ── If nothing owned yet ──
+  if(ownedMelee.length===0 && ownedMagic.length===0 && ownedArmors.length===0 && totalPots===0){
+    sec.innerHTML='<div style="text-align:center;color:#555;font-size:9px;font-family:Times New Roman,serif;padding:20px">Túi đồ trống. Hãy mua đồ từ cửa hàng 🛒</div>';
+  }
+
+  // ── Huy hiệu ──
+  if(typeof renderBadgeSection==='function') renderBadgeSection(sec);
+}
+
+
 // ═══════════════════════════════════════════
 // SHOP
 // ═══════════════════════════════════════════
@@ -240,8 +413,14 @@ function execCheat(cmd){
     potions.hp   = 99;
     potions.mana = 99;
     updateHUD();
+    if(typeof BADGE_DEFS!=='undefined'&&typeof learnStats!=='undefined'){
+      if(!learnStats.unlockedBadges) learnStats.unlockedBadges=[];
+      Object.keys(BADGE_DEFS).forEach(id=>{
+        if(!learnStats.unlockedBadges.includes(id)) learnStats.unlockedBadges.push(id);
+      });
+    }
     res.style.color='#00ff88';
-    res.textContent='✅ Tất cả trang bị đã được thêm vào túi đồ!';
+    res.textContent='✅ Tất cả trang bị + huy hiệu đã được thêm!';
     showNotif('🎁 give me all — Đã nhận tất cả!');
     setTimeout(closeCheatConsole, 1200);
 
@@ -257,22 +436,25 @@ function execCheat(cmd){
     setTimeout(closeCheatConsole,900);
 
   } else if(c==='god mode'||c==='godmode'){
-    playerHP=9999;playerMaxHP=9999;updateHUD();
-    res.style.color='#ffd700';res.textContent='👑 God Mode!';
+    playerHP=9999;playerMaxHP=9999;
+    playerMana=9999;playerMaxMana=9999;
+    if(equippedWpn)  equippedWpn.dmg=9999;
+    if(equippedMelee)equippedMelee.dmg=9999;
+    if(equippedMagic)equippedMagic.dmg=9999;
+    updateHUD();
+    res.style.color='#ffd700';res.textContent='👑 God Mode! HP/Mana/Dame → 9999';
+    showNotif('👑 God Mode ON!');
     setTimeout(closeCheatConsole,900);
 
   } else if(c==='level up'){
     playerLevel=Math.min(playerLevel+1,20);playerXP=0;
-    playerMaxHP=100+(playerLevel-1)*20;playerMaxMana=80+(playerLevel-1)*10;
-    // Auto-save khi lên cấp
-    if(typeof window.saveGameData==='function') window.saveGameData();
     playerMaxHP+=15;playerHP=Math.min(playerHP+15,playerMaxHP);
     updateHUD();res.style.color='#00ff88';res.textContent='⭐ Lên cấp '+playerLevel+'!';
     setTimeout(closeCheatConsole,900);
 
   } else if(c==='help'){
     res.style.color='#aaa';
-    res.textContent='give me all · heal · give coins N · god mode · level up · go underground N · go ocean N · speed N · time set day/night · dame N (max 1000) · mana N (max 9999)';
+    res.textContent='give me all · heal · give coins N · god mode · level up · go underground N · go ocean N · speed N · time set day/night · dame N (max 9999) · mana N (max 9999)';
 
   } else if(c.startsWith('go underground ')){
     const n=parseInt(c.split(' ')[2]);
@@ -358,9 +540,9 @@ function execCheat(cmd){
 
   } else if(c.startsWith('dame ')){
     const n=parseInt(c.split(' ')[1]);
-    if(isNaN(n)||n<1||n>1000){
+    if(isNaN(n)||n<1||n>9999){
       res.style.color='#e74c3c';
-      res.textContent='❌ Cú pháp: dame <1-1000>  (ví dụ: dame 500)';
+      res.textContent='❌ Cú pháp: dame <1-9999>  (ví dụ: dame 9999)';
     } else {
       // Tăng sát thương vũ khí đang dùng lên n
       if(equippedWpn){ equippedWpn.dmg=n; }

@@ -1342,10 +1342,10 @@ body.touch-mode #hud-prog-btn{display:none!important;}
   0%,100%{filter:drop-shadow(0 0 12px #ffd700);}
   50%{filter:drop-shadow(0 0 38px #ffd700) drop-shadow(0 0 70px #ff8c00);}
 }
-.lg-title{font-family:'Times New Roman',serif;font-size:20px;color:#ffd700;
+.lg-title{font-family:'Times New Roman',serif;font-size:30px;color:#ffd700;
   letter-spacing:4px;text-shadow:0 0 24px rgba(255,215,0,.8);
   text-align:center;margin-bottom:2px;}
-.lg-sub{font-family:'Times New Roman',serif;font-size:11px;color:#7a5820;
+.lg-sub{font-family:'Times New Roman',serif;font-size:21px;color:#7a5820;
   letter-spacing:3px;margin-bottom:16px;text-align:center;}
 .lg-box{
   background:linear-gradient(160deg,rgba(10,4,22,.97),rgba(22,10,45,.97));
@@ -1355,7 +1355,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
   display:flex;flex-direction:column;gap:10px;
   width:min(340px,92vw);
 }
-.lg-lbl{font-family:'Times New Roman',serif;font-size:10px;color:#7a5820;
+.lg-lbl{font-family:'Times New Roman',serif;font-size:20px;color:#7a5820;
   letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
 .lg-inp{
   width:100%;box-sizing:border-box;
@@ -1376,7 +1376,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 .lg-btn{
   background:linear-gradient(135deg,#2e1c00,#452a00);
   border:2px solid #ffd700;color:#ffd700;
-  font-family:'Times New Roman',serif;font-size:13px;letter-spacing:2px;
+  font-family:'Times New Roman',serif;font-size:20px;letter-spacing:2px;
   padding:12px;border-radius:3px;cursor:pointer;
   text-shadow:0 0 8px rgba(255,215,0,.5);transition:all .2s;
 }
@@ -1402,7 +1402,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 }
 .lg-role-card{
   display:flex;flex-direction:column;align-items:center;
-  width:140px;padding:20px 12px;cursor:pointer;
+  width:200px;padding:20px 12px;cursor:pointer;
   background:linear-gradient(135deg,rgba(255,215,0,0.10),rgba(180,130,20,0.18));
   border:2px solid rgba(255,215,0,0.35);border-radius:12px;
   transition:all .22s;user-select:none;-webkit-tap-highlight-color:transparent;
@@ -1412,13 +1412,13 @@ body.touch-mode #hud-prog-btn{display:none!important;}
   border-color:#ffd700;transform:translateY(-3px);
   box-shadow:0 6px 22px rgba(255,215,0,0.18);
 }
-.lg-role-icon{font-size:40px;margin-bottom:10px;}
+.lg-role-icon{font-size:60px;margin-bottom:10px;}
 .lg-role-name{
-  font-family:'Cinzel',serif;font-size:13px;color:#ffd700;
+  font-family:'Cinzel',serif;font-size:25px;color:#ffd700;
   font-weight:700;margin-bottom:6px;text-align:center;
 }
 .lg-role-desc{
-  font-family:'Times New Roman',serif;font-size:10px;
+  font-family:'Times New Roman',serif;font-size:20px;
   color:#b8965a;text-align:center;line-height:1.5;
 }
 /* ── Msg helpers ── */
@@ -1433,7 +1433,7 @@ body.touch-mode #hud-prog-btn{display:none!important;}
 /* ── Toggle row (2 links cạnh nhau) ── */
 .lg-toggle-row{
   display:flex;justify-content:space-between;align-items:center;
-  font-family:'Times New Roman',serif;font-size:11px;color:#7a5820;
+  font-family:'Times New Roman',serif;font-size:17px;color:#7a5820;
   border-top:1px solid rgba(255,215,0,0.1);padding-top:10px;margin-top:2px;
 }
 .lg-toggle-row span{color:#ffd700;text-decoration:underline;cursor:pointer;transition:color .2s;}

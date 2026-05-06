@@ -1666,11 +1666,11 @@ body.touch-mode #hud-prog-btn{display:none!important;}
   font-family:'Times New Roman','IM Fell English',serif;
 }
 #battle-quiz-overlay.on{display:flex;}
-.bq-title{font-size:10px;color:#ffd700;letter-spacing:1px;margin-bottom:6px;text-align:center;}
-.bq-question{font-size:11px;color:#fff;text-align:center;margin-bottom:8px;line-height:1.4;max-width:360px;}
-.bq-opts{display:grid;grid-template-columns:1fr 1fr;gap:5px;width:100%;max-width:360px;}
+.bq-title{font-size:25px;color:#ffd700;letter-spacing:1px;margin-bottom:6px;text-align:center;}
+.bq-question{font-size:20px;color:#fff;text-align:center;margin-bottom:8px;line-height:1.4;max-width:360px;}
+.bq-opts{display:grid;grid-template-columns:1fr 1fr;gap:30px;width:100%;max-width:360px;}
 .bq-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.2);
-  border-radius:5px;color:#e0e0e0;font-size:10px;padding:7px 6px;cursor:pointer;
+  border-radius:5px;color:#e0e0e0;font-size:20px;padding:7px 6px;cursor:pointer;
   font-family:inherit;text-align:left;line-height:1.3;}
 .bq-btn:hover{background:rgba(255,215,0,0.12);border-color:#ffd700;}
 .bq-btn.bq-ok{background:rgba(46,204,64,0.25);border-color:#2ecc40;color:#2ecc40;}
@@ -1682,16 +1682,16 @@ body.touch-mode #hud-prog-btn{display:none!important;}
   z-index:9999;font-family:'Times New Roman','IM Fell English',serif;gap:8px;
 }
 #prebattle-screen.on{display:flex;}
-.pb-title{font-size:18px;color:#ffd700;letter-spacing:2px;text-shadow:0 0 12px #ffd700;}
-.pb-sub{font-size:11px;color:#aaa;margin-bottom:8px;}
-.pb-monster{font-size:13px;color:#ff8888;margin-bottom:12px;}
+.pb-title{font-size:30px;color:#ffd700;letter-spacing:2px;text-shadow:0 0 12px #ffd700;}
+.pb-sub{font-size:18px;color:#aaa;margin-bottom:8px;}
+.pb-monster{font-size:20px;color:#ff8888;margin-bottom:12px;}
 .pb-btns{display:flex;flex-direction:column;gap:6px;width:260px;}
 .pb-btn{background:linear-gradient(135deg,rgba(20,20,30,0.9),rgba(10,10,20,0.9));
-  border:1px solid #555;border-radius:6px;color:#ddd;font-size:11px;
-  padding:10px 14px;cursor:pointer;font-family:inherit;
+  border:1px solid #555;border-radius:6px;color:#ddd;font-size:15px;
+  padding:13px 3px;cursor:pointer;font-family:inherit;
   display:flex;justify-content:space-between;align-items:center;}
 .pb-btn:hover{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,0.08);}
-.pb-btn .pb-reward{font-size:9px;color:#f39c12;}
+.pb-btn .pb-reward{font-size:15px;color:#f39c12;}
 
 /* ══ MINIGAME OVERLAY ══════════════════════════════════════════ */
 #minigame-overlay{
